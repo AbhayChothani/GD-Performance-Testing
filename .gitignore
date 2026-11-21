@@ -1,0 +1,33 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+
+# Debug & Temp files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.temp_*
+*.log
+*.tmp
+__pycache__/
+*.py[cod]
+
+# Environment variables
+.env*.local
+.env
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Dynamic screenshots cache
+public/screenshots/*
+!public/screenshots/.gitkeep
