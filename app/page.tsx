@@ -13,7 +13,7 @@ import { toAbsoluteUrl } from '@/lib/excelExport';
 
 export default function HomePage() {
   const [metadata, setMetadata] = useState<ReportMetadata>(DEFAULT_METADATA);
-  const [apiKey, setApiKey] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI');
   const [urlsText, setUrlsText] = useState<string>('https://www.girirajdigital.com/');
   const [items, setItems] = useState<PageAuditItem[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');

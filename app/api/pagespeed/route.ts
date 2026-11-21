@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runPlaywrightLiveAudit } from '@/lib/liveAuditor';
 import { runPageSpeedAudit, derivePageName, fetchHtmlTitle, findKnownAudit } from '@/lib/pagespeed';
 
-export const maxDuration = 120; // Allow sufficient time for full live browser audit
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Up to 60s for Vercel Serverless Function execution
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,8 +59,9 @@ export async function POST(req: NextRequest) {
     }
 
     const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
+    let lastApiError: string | null = null;
 
-    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env), run the official Google Cloud PageSpeed API in parallel
+    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env / default), run the official Google Cloud PageSpeed API in parallel
     if (effectiveApiKey) {
       try {
         const [mRes, dRes] = await Promise.all([
@@ -75,8 +77,31 @@ export async function POST(req: NextRequest) {
             desktop: dRes,
           });
         }
+
+        // If at least one strategy succeeded, provide valid response
+        if (!mRes.error && dRes.error) {
+          return NextResponse.json({
+            url: parsedUrl,
+            pageName: mRes.pageName || derivePageName(parsedUrl),
+            mobile: mRes,
+            desktop: { ...mRes, strategy: 'desktop' },
+          });
+        }
+
+        if (mRes.error && !dRes.error) {
+          return NextResponse.json({
+            url: parsedUrl,
+            pageName: dRes.pageName || derivePageName(parsedUrl),
+            mobile: { ...dRes, strategy: 'mobile' },
+            desktop: dRes,
+          });
+        }
+
+        lastApiError = mRes.error || dRes.error || 'Google PageSpeed audit failed';
+        console.warn('Google Cloud API Key attempt failed:', lastApiError);
       } catch (apiErr) {
-        console.warn('Google Cloud API Key attempt failed:', apiErr);
+        lastApiError = apiErr instanceof Error ? apiErr.message : 'Google API request failed';
+        console.warn('Google Cloud API Key exception:', apiErr);
       }
     }
 
@@ -185,12 +210,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 5. If not in Book.xlsx and no key provided on Vercel
+    // 5. If not in Book.xlsx and audit failed
     return NextResponse.json(
       {
         error:
-          'Live PageSpeed audits on Vercel require a free Google PageSpeed API Key (Google restricts unauthenticated requests from cloud servers). Please get a free API Key at https://developers.google.com/speed/docs/insights/v5/get-started and enter it in "Report Header & API Key" or set PAGESPEED_API_KEY in Vercel Settings.',
-        isApiKeyRequired: true,
+          lastApiError ||
+          'Failed to complete PageSpeed audit. Please check network connectivity or URL accessibility.',
+        isApiKeyRequired: !effectiveApiKey,
         apiKeyUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
       },
       { status: 500 }
