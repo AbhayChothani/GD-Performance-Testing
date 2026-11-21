@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || '').trim();
+    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
 
     // 1. If an API key is provided (or set in PAGESPEED_API_KEY env), try the official Google Cloud PageSpeed API first
     if (effectiveApiKey) {

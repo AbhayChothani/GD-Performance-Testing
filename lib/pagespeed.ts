@@ -81,12 +81,14 @@ export async function fetchHtmlTitle(url: string): Promise<string | null> {
   }
 }
 
+export const DEFAULT_PAGESPEED_API_KEY = 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI';
+
 export async function runPageSpeedAudit(
   url: string,
   strategy: 'mobile' | 'desktop',
   userApiKey?: string
 ): Promise<PageSpeedApiResponse> {
-  const apiKey = userApiKey || process.env.PAGESPEED_API_KEY || '';
+  const apiKey = userApiKey || process.env.PAGESPEED_API_KEY || DEFAULT_PAGESPEED_API_KEY;
   const apiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
 
   apiUrl.searchParams.set('url', url);
