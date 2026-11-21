@@ -59,11 +59,13 @@ export async function POST(req: NextRequest) {
 
     const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
 
-    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env), try the official Google Cloud PageSpeed API first
+    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env), run the official Google Cloud PageSpeed API in parallel
     if (effectiveApiKey) {
       try {
-        const mRes = await runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey);
-        const dRes = await runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey);
+        const [mRes, dRes] = await Promise.all([
+          runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey),
+          runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey),
+        ]);
 
         if (!mRes.error && !dRes.error) {
           return NextResponse.json({
@@ -126,8 +128,10 @@ export async function POST(req: NextRequest) {
 
     // 3. Fallback: Try Google PageSpeed REST API without key (in case public quota is available)
     try {
-      const mRes = await runPageSpeedAudit(parsedUrl, 'mobile');
-      const dRes = await runPageSpeedAudit(parsedUrl, 'desktop');
+      const [mRes, dRes] = await Promise.all([
+        runPageSpeedAudit(parsedUrl, 'mobile'),
+        runPageSpeedAudit(parsedUrl, 'desktop'),
+      ]);
       if (!mRes.error && !dRes.error) {
         return NextResponse.json({
           url: parsedUrl,
