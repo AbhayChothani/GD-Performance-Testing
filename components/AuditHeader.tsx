@@ -159,22 +159,32 @@ export const AuditHeader: React.FC<AuditHeaderProps> = ({
                 </div>
               </div>
 
-              {/* Optional PageSpeed API Key */}
+              {/* Google PageSpeed API Key */}
               <div className="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="w-full sm:max-w-md">
-                  <label className="flex items-center gap-1.5 text-xs text-slate-400 mb-1">
-                    <Key className="w-3.5 h-3.5 text-amber-400" /> Optional Google PageSpeed API Key
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="flex items-center gap-1.5 text-xs text-slate-300 font-medium">
+                      <Key className="w-3.5 h-3.5 text-amber-400" /> Google PageSpeed API Key
+                    </label>
+                    <a
+                      href="https://developers.google.com/speed/docs/insights/v5/get-started"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-teal-400 hover:text-teal-300 underline font-semibold flex items-center gap-1"
+                    >
+                      Get Free Key (30s) ↗
+                    </a>
+                  </div>
                   <input
                     type="password"
                     value={apiKey}
                     onChange={(e) => onApiKeyChange(e.target.value)}
-                    placeholder="Optional: Enter Google API key for higher rate limits (works without key)"
+                    placeholder="Enter Google API key (AIzaSy...)"
                     className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
                   />
                 </div>
-                <div className="text-[11px] text-slate-400 self-start sm:self-end">
-                  🛡️ Without a key, requests use Google&apos;s public rate limit with smart fallback.
+                <div className="text-[11px] text-slate-400 self-start sm:self-end max-w-sm">
+                  🔑 Required on cloud deployments (Vercel) to avoid Google Cloud 429 rate limits. Free 25,000 queries/day. Can also be set as <code className="text-teal-300">PAGESPEED_API_KEY</code> in Vercel settings.
                 </div>
               </div>
             </div>

@@ -230,7 +230,18 @@ https://www.girirajdigital.com/ecommerce-solution/`}
       <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
         <div className="text-xs text-slate-500">
           💡 For each URL, both <strong className="text-slate-700">Mobile</strong> and{' '}
-          <strong className="text-slate-700">Desktop</strong> audits will run automatically (2 rows per URL).
+          <strong className="text-slate-700">Desktop</strong> audits will run automatically.
+          <span className="block mt-1 text-[11px] text-amber-700 dark:text-amber-500">
+            ⚡ On Vercel: Provide a free Google PageSpeed API Key in Report Header (Google blocks unauthenticated requests from cloud servers).{' '}
+            <a
+              href="https://developers.google.com/speed/docs/insights/v5/get-started"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-bold hover:text-amber-800 dark:hover:text-amber-400"
+            >
+              Get Free Key (30s) ↗
+            </a>
+          </span>
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">

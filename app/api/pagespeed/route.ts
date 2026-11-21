@@ -57,11 +57,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 1. If an API key is provided, try the official Google Cloud PageSpeed API first
-    if (apiKey) {
+    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || '').trim();
+
+    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env), try the official Google Cloud PageSpeed API first
+    if (effectiveApiKey) {
       try {
-        const mRes = await runPageSpeedAudit(parsedUrl, 'mobile', apiKey);
-        const dRes = await runPageSpeedAudit(parsedUrl, 'desktop', apiKey);
+        const mRes = await runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey);
+        const dRes = await runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey);
 
         if (!mRes.error && !dRes.error) {
           return NextResponse.json({
@@ -72,58 +74,60 @@ export async function POST(req: NextRequest) {
           });
         }
       } catch (apiErr) {
-        console.warn('Google Cloud API Key attempt failed, falling back to live web audit:', apiErr);
+        console.warn('Google Cloud API Key attempt failed:', apiErr);
       }
     }
 
-    // 2. Run the REAL LIVE PageSpeed Web Audit via Headless Chrome / Puppeteer
-    // Generates a brand new report with unique report ID on pagespeed.web.dev
-    try {
-      const liveResult = await runPlaywrightLiveAudit(parsedUrl);
-      if (liveResult.success) {
-        return NextResponse.json({
-          url: parsedUrl,
-          pageName: liveResult.pageName || derivePageName(parsedUrl),
-          mobile: {
+    // 2. If running locally (not in a serverless environment like Vercel), run headless Chrome / Puppeteer
+    const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+    if (!isVercel) {
+      try {
+        const liveResult = await runPlaywrightLiveAudit(parsedUrl);
+        if (liveResult.success) {
+          return NextResponse.json({
             url: parsedUrl,
-            strategy: 'mobile',
-            pageName: liveResult.pageName,
-            metrics: {
-              performance: liveResult.mobile.performance,
-              accessibility: liveResult.mobile.accessibility,
-              bestPractices: liveResult.mobile.bestPractices,
-              seo: liveResult.mobile.seo,
-              totalBlockingTime: liveResult.mobile.totalBlockingTime,
+            pageName: liveResult.pageName || derivePageName(parsedUrl),
+            mobile: {
+              url: parsedUrl,
+              strategy: 'mobile',
+              pageName: liveResult.pageName,
+              metrics: {
+                performance: liveResult.mobile.performance,
+                accessibility: liveResult.mobile.accessibility,
+                bestPractices: liveResult.mobile.bestPractices,
+                seo: liveResult.mobile.seo,
+                totalBlockingTime: liveResult.mobile.totalBlockingTime,
+              },
+              screenshotUrl: liveResult.mobile.screenshotUrl,
+              screenshotDataUri: liveResult.mobile.screenshotDataUri,
+              reportUrl: liveResult.mobile.reportUrl,
             },
-            screenshotUrl: liveResult.mobile.screenshotUrl,
-            screenshotDataUri: liveResult.mobile.screenshotDataUri,
-            reportUrl: liveResult.mobile.reportUrl,
-          },
-          desktop: {
-            url: parsedUrl,
-            strategy: 'desktop',
-            pageName: liveResult.pageName,
-            metrics: {
-              performance: liveResult.desktop.performance,
-              accessibility: liveResult.desktop.accessibility,
-              bestPractices: liveResult.desktop.bestPractices,
-              seo: liveResult.desktop.seo,
-              totalBlockingTime: liveResult.desktop.totalBlockingTime,
+            desktop: {
+              url: parsedUrl,
+              strategy: 'desktop',
+              pageName: liveResult.pageName,
+              metrics: {
+                performance: liveResult.desktop.performance,
+                accessibility: liveResult.desktop.accessibility,
+                bestPractices: liveResult.desktop.bestPractices,
+                seo: liveResult.desktop.seo,
+                totalBlockingTime: liveResult.desktop.totalBlockingTime,
+              },
+              screenshotUrl: liveResult.desktop.screenshotUrl,
+              screenshotDataUri: liveResult.desktop.screenshotDataUri,
+              reportUrl: liveResult.desktop.reportUrl,
             },
-            screenshotUrl: liveResult.desktop.screenshotUrl,
-            screenshotDataUri: liveResult.desktop.screenshotDataUri,
-            reportUrl: liveResult.desktop.reportUrl,
-          },
-        });
+          });
+        }
+      } catch (liveErr) {
+        console.error('Puppeteer live audit error:', liveErr);
       }
-    } catch (liveErr) {
-      console.error('Puppeteer live audit error:', liveErr);
     }
 
-    // 3. Fallback: Try Google PageSpeed REST API
+    // 3. Fallback: Try Google PageSpeed REST API without key (in case public quota is available)
     try {
-      const mRes = await runPageSpeedAudit(parsedUrl, 'mobile', apiKey);
-      const dRes = await runPageSpeedAudit(parsedUrl, 'desktop', apiKey);
+      const mRes = await runPageSpeedAudit(parsedUrl, 'mobile');
+      const dRes = await runPageSpeedAudit(parsedUrl, 'desktop');
       if (!mRes.error && !dRes.error) {
         return NextResponse.json({
           url: parsedUrl,
@@ -136,8 +140,55 @@ export async function POST(req: NextRequest) {
       console.warn('PageSpeed REST API fallback failed:', apiFallbackErr);
     }
 
+    // 4. Graceful Fallback: If this URL is in Book.xlsx, return Book.xlsx reference data so audit does not crash
+    const known = findKnownAudit(parsedUrl);
+    if (known) {
+      return NextResponse.json({
+        url: known.pageUrl,
+        pageName: known.pageName,
+        isReferenceFallback: true,
+        notice: 'Reference data from Book.xlsx (Add a Google PageSpeed API Key in settings for fresh live audits on Vercel).',
+        mobile: {
+          url: known.pageUrl,
+          strategy: 'mobile',
+          pageName: known.pageName,
+          metrics: {
+            performance: known.mobile.performance,
+            accessibility: known.mobile.accessibility,
+            bestPractices: known.mobile.bestPractices,
+            seo: known.mobile.seo,
+            totalBlockingTime: known.mobile.totalBlockingTime,
+          },
+          screenshotUrl: known.mobile.screenshotUrl,
+          reportUrl: known.mobile.reportUrl,
+          comment: 'Reference audit data (Book.xlsx)',
+        },
+        desktop: {
+          url: known.pageUrl,
+          strategy: 'desktop',
+          pageName: known.pageName,
+          metrics: {
+            performance: known.desktop.performance,
+            accessibility: known.desktop.accessibility,
+            bestPractices: known.desktop.bestPractices,
+            seo: known.desktop.seo,
+            totalBlockingTime: known.desktop.totalBlockingTime,
+          },
+          screenshotUrl: known.desktop.screenshotUrl,
+          reportUrl: known.desktop.reportUrl,
+          comment: 'Reference audit data (Book.xlsx)',
+        },
+      });
+    }
+
+    // 5. If not in Book.xlsx and no key provided on Vercel
     return NextResponse.json(
-      { error: 'Failed to generate live PageSpeed audit. Please check network connectivity or provide an API Key.' },
+      {
+        error:
+          'Live PageSpeed audits on Vercel require a free Google PageSpeed API Key (Google restricts unauthenticated requests from cloud servers). Please get a free API Key at https://developers.google.com/speed/docs/insights/v5/get-started and enter it in "Report Header & API Key" or set PAGESPEED_API_KEY in Vercel Settings.',
+        isApiKeyRequired: true,
+        apiKeyUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
+      },
       { status: 500 }
     );
   } catch (error: unknown) {
