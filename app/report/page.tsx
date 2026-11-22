@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -14,11 +14,14 @@ import {
   Clock,
   Globe,
   Share2,
+  Printer,
+  Check,
 } from 'lucide-react';
 import { generatePageSpeedCardSvg } from '@/lib/pageSpeedCardGenerator';
 
 function ReportContent() {
   const searchParams = useSearchParams();
+  const [copied, setCopied] = useState(false);
 
   const url = searchParams.get('url') || 'https://www.girirajdigital.com/';
   const strategy = (searchParams.get('strategy') || 'mobile') as 'mobile' | 'desktop';
@@ -32,6 +35,7 @@ function ReportContent() {
   const lcp = searchParams.get('lcp') || '1.8 s';
   const cls = searchParams.get('cls') || '0';
   const si = searchParams.get('si') || '5.6 s';
+  const img = searchParams.get('img') || '';
   const auditDate = searchParams.get('date') || new Date().toISOString().split('T')[0];
 
   const isMobile = strategy === 'mobile';
@@ -51,9 +55,18 @@ function ReportContent() {
     largestContentfulPaint: lcp,
     cumulativeLayoutShift: cls,
     speedIndex: si,
+    screenshotDataUri: img || undefined,
   });
 
-  const cardDataUri = `data:image/svg+xml;base64,${Buffer.from(cardSvg, 'utf-8').toString('base64')}`;
+  const cardDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(cardSvg)}`;
+
+  const handleCopyLink = () => {
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const getScoreBadgeClass = (score: number) => {
     if (score >= 90) return 'bg-[#38761D] text-white';
@@ -86,6 +99,24 @@ function ReportContent() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
+              title="Copy exact snapshot URL to share with client or team"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition hidden sm:flex"
+              title="Print or save as PDF"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print</span>
+            </button>
             <a
               href={googleLiveUrl}
               target="_blank"

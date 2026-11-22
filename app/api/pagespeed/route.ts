@@ -173,6 +173,9 @@ export async function POST(req: NextRequest) {
         known.desktop.screenshotUrl ||
         `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
 
+      const mStaticReportUrl = `/report?url=${encodeURIComponent(known.pageUrl)}&strategy=mobile&name=${encodeURIComponent(known.pageName)}&p=${known.mobile.performance || 85}&a=${known.mobile.accessibility || 98}&b=${known.mobile.bestPractices || 96}&s=${known.mobile.seo || 100}&tbt=${encodeURIComponent(`${known.mobile.totalBlockingTime || 180} ms`)}`;
+      const dStaticReportUrl = `/report?url=${encodeURIComponent(known.pageUrl)}&strategy=desktop&name=${encodeURIComponent(known.pageName)}&p=${known.desktop.performance || 95}&a=${known.desktop.accessibility || 98}&b=${known.desktop.bestPractices || 96}&s=${known.desktop.seo || 100}&tbt=${encodeURIComponent(`${known.desktop.totalBlockingTime || 50} ms`)}`;
+
       return NextResponse.json({
         url: known.pageUrl,
         pageName: known.pageName,
@@ -191,8 +194,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: mImgbbUrl,
           screenshotDataUri: mCardDataUri,
-          reportUrl: mDirectUrl,
-          detailReportUrl: mDirectUrl,
+          reportUrl: mStaticReportUrl,
+          detailReportUrl: mStaticReportUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -208,8 +211,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: dImgbbUrl,
           screenshotDataUri: dCardDataUri,
-          reportUrl: dDirectUrl,
-          detailReportUrl: dDirectUrl,
+          reportUrl: dStaticReportUrl,
+          detailReportUrl: dStaticReportUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
       });

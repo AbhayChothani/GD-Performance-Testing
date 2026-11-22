@@ -290,15 +290,26 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                       {isMobileRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.mobile.reportUrl ? (
-                        <a
-                          href={item.mobile.reportUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline truncate block text-[11px] font-mono"
-                          title={item.mobile.reportUrl}
-                        >
-                          {item.mobile.reportUrl}
-                        </a>
+                        <div className="flex items-center justify-between gap-1">
+                          <a
+                            href={item.mobile.reportUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 underline truncate block text-[11px] font-mono flex-1"
+                            title="Open exact static snapshot report (locks scores, never re-runs)"
+                          >
+                            {item.mobile.reportUrl}
+                          </a>
+                          <a
+                            href={`https://pagespeed.web.dev/analysis?url=${encodeURIComponent(item.pageUrl)}&form_factor=mobile`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-slate-400 hover:text-blue-600 p-0.5 rounded transition shrink-0"
+                            title="Open live scan on Google PageSpeed Insights"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">-</span>
                       )}
@@ -433,15 +444,26 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                       {isDesktopRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.desktop.reportUrl ? (
-                        <a
-                          href={item.desktop.reportUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 underline truncate block text-[11px] font-mono"
-                          title={item.desktop.reportUrl}
-                        >
-                          {item.desktop.reportUrl}
-                        </a>
+                        <div className="flex items-center justify-between gap-1">
+                          <a
+                            href={item.desktop.reportUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 underline truncate block text-[11px] font-mono flex-1"
+                            title="Open exact static snapshot report (locks scores, never re-runs)"
+                          >
+                            {item.desktop.reportUrl}
+                          </a>
+                          <a
+                            href={`https://pagespeed.web.dev/analysis?url=${encodeURIComponent(item.pageUrl)}&form_factor=desktop`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-slate-400 hover:text-blue-600 p-0.5 rounded transition shrink-0"
+                            title="Open live scan on Google PageSpeed Insights"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">-</span>
                       )}

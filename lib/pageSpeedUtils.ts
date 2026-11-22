@@ -3,6 +3,54 @@
  * No Node.js filesystem dependencies (fs/path) so it can be safely imported anywhere
  */
 
+export interface StaticReportUrlParams {
+  url: string;
+  strategy: 'mobile' | 'desktop';
+  pageName?: string;
+  performance: number;
+  accessibility: number;
+  bestPractices: number;
+  seo: number;
+  totalBlockingTime?: number | string;
+  firstContentfulPaint?: string;
+  largestContentfulPaint?: string;
+  cumulativeLayoutShift?: string;
+  speedIndex?: string;
+  screenshotUrl?: string;
+  origin?: string;
+}
+
+export function buildStaticReportUrl(params: StaticReportUrlParams): string {
+  const q = new URLSearchParams();
+  q.set('url', params.url);
+  q.set('strategy', params.strategy.toLowerCase());
+  if (params.pageName) q.set('name', params.pageName);
+  q.set('p', String(params.performance ?? 0));
+  q.set('a', String(params.accessibility ?? 0));
+  q.set('b', String(params.bestPractices ?? 0));
+  q.set('s', String(params.seo ?? 0));
+
+  if (params.totalBlockingTime !== undefined) {
+    const tbtStr = String(params.totalBlockingTime).includes('ms')
+      ? String(params.totalBlockingTime)
+      : `${params.totalBlockingTime} ms`;
+    q.set('tbt', tbtStr);
+  }
+  if (params.firstContentfulPaint) q.set('fcp', params.firstContentfulPaint);
+  if (params.largestContentfulPaint) q.set('lcp', params.largestContentfulPaint);
+  if (params.cumulativeLayoutShift) q.set('cls', params.cumulativeLayoutShift);
+  if (params.speedIndex) q.set('si', params.speedIndex);
+  if (params.screenshotUrl && !params.screenshotUrl.startsWith('data:')) {
+    q.set('img', params.screenshotUrl);
+  }
+
+  const path = `/report?${q.toString()}`;
+  if (params.origin) {
+    return `${params.origin.replace(/\/+$/, '')}${path}`;
+  }
+  return path;
+}
+
 export function buildPageSpeedReportUrl(
   targetUrl: string,
   strategy: 'mobile' | 'desktop'
