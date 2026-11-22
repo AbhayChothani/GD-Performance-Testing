@@ -9,6 +9,12 @@ interface ReportTableProps {
   items: PageAuditItem[];
   onCommentChange: (itemId: string, screenType: ScreenType, comment: string) => void;
   onPageNameChange: (itemId: string, pageName: string) => void;
+  onMetricChange?: (
+    itemId: string,
+    screenType: ScreenType,
+    field: 'performance' | 'accessibility' | 'bestPractices' | 'seo' | 'totalBlockingTime' | 'reportUrl',
+    value: number | string
+  ) => void;
   onReauditUrl?: (url: string, itemId: string) => void;
   isAuditing?: boolean;
 }
@@ -17,6 +23,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
   items,
   onCommentChange,
   onPageNameChange,
+  onMetricChange,
   onReauditUrl,
   isAuditing,
 }) => {
@@ -197,43 +204,122 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 5. Performance */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.mobile.performance
                       )}`}
                     >
-                      {item.mobile.performance !== null ? item.mobile.performance : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.mobile.performance !== null ? item.mobile.performance : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Mobile', 'performance', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Mobile Performance score"
+                        />
+                      )}
                     </td>
 
                     {/* 6. Accessibility */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.mobile.accessibility
                       )}`}
                     >
-                      {item.mobile.accessibility !== null ? item.mobile.accessibility : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.mobile.accessibility !== null ? item.mobile.accessibility : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Mobile', 'accessibility', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Mobile Accessibility score"
+                        />
+                      )}
                     </td>
 
                     {/* 7. Best Practices */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.mobile.bestPractices
                       )}`}
                     >
-                      {item.mobile.bestPractices !== null ? item.mobile.bestPractices : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.mobile.bestPractices !== null ? item.mobile.bestPractices : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Mobile', 'bestPractices', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Mobile Best Practices score"
+                        />
+                      )}
                     </td>
 
                     {/* 8. SEO */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.mobile.seo
                       )}`}
                     >
-                      {item.mobile.seo !== null ? item.mobile.seo : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.mobile.seo !== null ? item.mobile.seo : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Mobile', 'seo', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Mobile SEO score"
+                        />
+                      )}
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
-                    <td className="border border-black px-3 py-2 text-right font-mono font-medium text-slate-800 align-middle">
-                      {item.mobile.totalBlockingTime !== null ? `${item.mobile.totalBlockingTime}` : isItemRunning ? '...' : '-'}
+                    <td className="border border-black px-2 py-1 text-right font-mono font-medium text-slate-800 align-middle">
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          value={item.mobile.totalBlockingTime !== null ? item.mobile.totalBlockingTime : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Mobile', 'totalBlockingTime', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-16 text-right bg-transparent font-mono font-semibold focus:outline-none focus:border-emerald-500 rounded px-1 py-0.5 cursor-pointer"
+                          title="Click to edit Mobile TBT (ms)"
+                        />
+                      )}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}
@@ -317,43 +403,122 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 5. Performance */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.desktop.performance
                       )}`}
                     >
-                      {item.desktop.performance !== null ? item.desktop.performance : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.desktop.performance !== null ? item.desktop.performance : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Desktop', 'performance', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Desktop Performance score"
+                        />
+                      )}
                     </td>
 
                     {/* 6. Accessibility */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.desktop.accessibility
                       )}`}
                     >
-                      {item.desktop.accessibility !== null ? item.desktop.accessibility : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.desktop.accessibility !== null ? item.desktop.accessibility : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Desktop', 'accessibility', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Desktop Accessibility score"
+                        />
+                      )}
                     </td>
 
                     {/* 7. Best Practices */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.desktop.bestPractices
                       )}`}
                     >
-                      {item.desktop.bestPractices !== null ? item.desktop.bestPractices : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.desktop.bestPractices !== null ? item.desktop.bestPractices : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Desktop', 'bestPractices', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Desktop Best Practices score"
+                        />
+                      )}
                     </td>
 
                     {/* 8. SEO */}
                     <td
-                      className={`border border-black px-2 py-2 text-center align-middle text-sm transition-all ${getScoreCellStyle(
+                      className={`border border-black px-1 py-1 text-center align-middle text-sm transition-all ${getScoreCellStyle(
                         item.desktop.seo
                       )}`}
                     >
-                      {item.desktop.seo !== null ? item.desktop.seo : isItemRunning ? '...' : '-'}
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={item.desktop.seo !== null ? item.desktop.seo : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Desktop', 'seo', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-12 text-center bg-transparent font-bold focus:outline-none focus:ring-1 focus:ring-white rounded py-0.5 cursor-pointer text-inherit"
+                          title="Click to edit Desktop SEO score"
+                        />
+                      )}
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
-                    <td className="border border-black px-3 py-2 text-right font-mono font-medium text-slate-800 align-middle">
-                      {item.desktop.totalBlockingTime !== null ? `${item.desktop.totalBlockingTime}` : isItemRunning ? '...' : '-'}
+                    <td className="border border-black px-2 py-1 text-right font-mono font-medium text-slate-800 align-middle">
+                      {isItemRunning ? (
+                        '...'
+                      ) : (
+                        <input
+                          type="number"
+                          min={0}
+                          value={item.desktop.totalBlockingTime !== null ? item.desktop.totalBlockingTime : ''}
+                          onChange={(e) => {
+                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                            onMetricChange?.(item.id, 'Desktop', 'totalBlockingTime', isNaN(val) ? 0 : val);
+                          }}
+                          placeholder="-"
+                          className="w-16 text-right bg-transparent font-mono font-semibold focus:outline-none focus:border-emerald-500 rounded px-1 py-0.5 cursor-pointer"
+                          title="Click to edit Desktop TBT (ms)"
+                        />
+                      )}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}

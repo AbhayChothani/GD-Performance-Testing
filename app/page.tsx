@@ -297,6 +297,56 @@ export default function HomePage() {
     );
   };
 
+  const handleMetricChange = (
+    itemId: string,
+    screenType: ScreenType,
+    field: 'performance' | 'accessibility' | 'bestPractices' | 'seo' | 'totalBlockingTime' | 'reportUrl',
+    value: number | string
+  ) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        const targetStrategy = screenType === 'Mobile' ? 'mobile' : 'desktop';
+        const currentMetrics = screenType === 'Mobile' ? item.mobile : item.desktop;
+
+        const updatedMetrics = {
+          ...currentMetrics,
+          [field]: typeof value === 'number' && isNaN(value) ? 0 : value,
+        };
+
+        // If numerical score changed, update reportUrl and card screenshot query params as well
+        if (field !== 'reportUrl') {
+          const p = field === 'performance' ? (value as number) : (currentMetrics.performance ?? 90);
+          const a = field === 'accessibility' ? (value as number) : (currentMetrics.accessibility ?? 98);
+          const b = field === 'bestPractices' ? (value as number) : (currentMetrics.bestPractices ?? 96);
+          const s = field === 'seo' ? (value as number) : (currentMetrics.seo ?? 100);
+          const tbtVal = field === 'totalBlockingTime' ? `${value} ms` : `${currentMetrics.totalBlockingTime ?? 180} ms`;
+
+          const reportParams = new URLSearchParams({
+            url: item.pageUrl,
+            strategy: targetStrategy,
+            name: item.pageName,
+            p: p.toString(),
+            a: a.toString(),
+            b: b.toString(),
+            s: s.toString(),
+            tbt: tbtVal,
+          });
+
+          updatedMetrics.reportUrl = `/report?${reportParams.toString()}`;
+          const currentScrUrl = currentMetrics.screenshotUrl || '';
+          const baseScr = currentScrUrl.split('?')[0] || `/api/screenshot/audit-${targetStrategy}`;
+          updatedMetrics.screenshotUrl = `${baseScr}?${reportParams.toString()}`;
+        }
+
+        return {
+          ...item,
+          [screenType === 'Mobile' ? 'mobile' : 'desktop']: updatedMetrics,
+        };
+      })
+    );
+  };
+
   const handleClearAll = () => {
     if (confirm('Clear all audit results?')) {
       setItems([]);
@@ -387,6 +437,7 @@ export default function HomePage() {
           items={filteredItems}
           onCommentChange={handleCommentChange}
           onPageNameChange={handlePageNameChange}
+          onMetricChange={handleMetricChange}
           onReauditUrl={handleReauditUrl}
           isAuditing={isAuditing}
         />

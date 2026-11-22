@@ -201,6 +201,22 @@ export async function runPageSpeedAudit(
     });
     const screenshotUrl = `/api/screenshot/${auditId}?${queryParams.toString()}`;
 
+    const reportParams = new URLSearchParams({
+      url,
+      strategy,
+      name: pageName,
+      p: performance.toString(),
+      a: accessibility.toString(),
+      b: bestPractices.toString(),
+      s: seo.toString(),
+      tbt: tbtDisplay,
+      fcp,
+      lcp,
+      cls,
+      si: speedIndex,
+    });
+    const reportUrl = `/report?${reportParams.toString()}`;
+
     return {
       url,
       strategy,

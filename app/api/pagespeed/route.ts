@@ -246,7 +246,10 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: `/api/screenshot/audit-ref-mobile?${mParams.toString()}`,
           screenshotDataUri: mCardDataUri,
-          reportUrl: known.mobile.reportUrl,
+          reportUrl:
+            known.mobile.reportUrl && known.mobile.reportUrl.includes('/hg2pah6wia')
+              ? known.mobile.reportUrl
+              : `/report?${mParams.toString()}&name=${encodeURIComponent(known.pageName)}`,
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -262,7 +265,10 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: `/api/screenshot/audit-ref-desktop?${dParams.toString()}`,
           screenshotDataUri: dCardDataUri,
-          reportUrl: known.desktop.reportUrl,
+          reportUrl:
+            known.desktop.reportUrl && known.desktop.reportUrl.includes('/hg2pah6wia')
+              ? known.desktop.reportUrl
+              : `/report?${dParams.toString()}&name=${encodeURIComponent(known.pageName)}`,
           comment: 'Reference audit data (Book.xlsx)',
         },
       });
