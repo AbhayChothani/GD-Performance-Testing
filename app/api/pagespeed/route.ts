@@ -61,16 +61,19 @@ export async function POST(req: NextRequest) {
     }
 
     const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const hasBrowserless = Boolean(process.env.BROWSERLESS_WS_ENDPOINT?.trim());
 
-    // 1. ON LOCALHOST (!process.env.VERCEL):
-    // Use local Chrome/Puppeteer to open pagespeed.web.dev, run analysis,
-    // and capture the permanent static snapshot URL: https://pagespeed.web.dev/analysis/<slug>/<report-id>?form_factor=mobile
-    if (!isVercel) {
+    // 1. Run live browser audit on Localhost (!isVercel) OR on Vercel if BROWSERLESS_WS_ENDPOINT is configured
+    if (!isVercel || hasBrowserless) {
       try {
-        console.log(`[Localhost] Starting local Puppeteer live audit for ${parsedUrl}...`);
+        console.log(
+          `[Browser Audit] Starting live browser audit for ${parsedUrl} (isVercel=${isVercel}, remoteBrowser=${hasBrowserless})...`
+        );
         const liveResult = await runPlaywrightLiveAudit(parsedUrl);
         if (liveResult.success && liveResult.mobile.detailReportUrl) {
-          console.log(`[Localhost] Successfully captured static snapshot URL: ${liveResult.mobile.detailReportUrl}`);
+          console.log(
+            `[Browser Audit] Successfully captured real static snapshot URL: ${liveResult.mobile.detailReportUrl}`
+          );
           return NextResponse.json({
             url: parsedUrl,
             pageName: liveResult.pageName || derivePageName(parsedUrl),
@@ -108,15 +111,15 @@ export async function POST(req: NextRequest) {
             },
           });
         }
-      } catch (localPuppeteerErr) {
+      } catch (browserErr) {
         console.warn(
-          '[Localhost] Puppeteer live audit failed, falling back to official Google PageSpeed API:',
-          localPuppeteerErr
+          '[Browser Audit] Browser audit failed, falling back to official Google PageSpeed API:',
+          browserErr
         );
       }
     }
 
-    // 2. ON VERCEL (OR FALLBACK):
+    // 2. On Vercel without BROWSERLESS_WS_ENDPOINT (or fallback):
     // Use official Google PageSpeed Insights REST API (Fast & Never times out on cloud IPs)
     const effectiveApiKey = (
       apiKey ||

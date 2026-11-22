@@ -57,33 +57,21 @@ function getBrowserExecutablePath(): string {
 export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAuditOutput> {
   let browser;
 
-  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    const chromium = (await import('@sparticuz/chromium-min')).default;
-    (chromium as any).setHeadlessMode = true;
-    (chromium as any).setGraphicsMode = false;
+  const browserlessWs = process.env.BROWSERLESS_WS_ENDPOINT?.trim();
 
-    // Ensure AL2023 shared libraries (libnss3.so, etc.) are found
-    process.env.LD_LIBRARY_PATH = [
-      '/tmp/al2023/lib',
-      '/tmp/lib',
-      process.env.LD_LIBRARY_PATH,
-    ]
-      .filter(Boolean)
-      .join(':');
-
-    const CHROMIUM_PACK_URL =
-      process.env.CHROMIUM_PACK_URL ||
-      'https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar';
-
-    const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
-
-    browser = await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: (chromium as any).defaultViewport,
-      executablePath,
-      headless: true,
+  // 1. If remote BROWSERLESS_WS_ENDPOINT is configured (e.g. on Vercel or cloud)
+  if (browserlessWs) {
+    console.log(`[Browser] Connecting to remote browserless at ${browserlessWs.split('?')[0]}...`);
+    browser = await puppeteer.connect({
+      browserWSEndpoint: browserlessWs,
+      defaultViewport: { width: 1280, height: 1100 },
     });
+  } else if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    throw new Error(
+      'Headless Chromium on Vercel is disabled. Configure BROWSERLESS_WS_ENDPOINT or use the official Google PageSpeed API.'
+    );
   } else {
+    // Local Chrome / Edge launch
     const executablePath = getBrowserExecutablePath();
     if (!fs.existsSync(executablePath)) {
       throw new Error(`Chrome / Edge executable not found at ${executablePath}`);
@@ -128,8 +116,13 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     });
 
     // 2. Enter target URL into search box and click "Analyze"
-    const inputSelector = 'input[type="url"], input[type="text"], input[name="url"], input';
+    const inputSelector = 'input[name="url"], input[type="url"], input[type="text"], input';
     await page.waitForSelector(inputSelector, { timeout: 15000 });
+    await page.click(inputSelector);
+    await page.evaluate((sel) => {
+      const el = document.querySelector(sel) as HTMLInputElement;
+      if (el) el.value = '';
+    }, inputSelector);
     await page.type(inputSelector, targetUrl, { delay: 10 });
 
     await page.evaluate(() => {
@@ -139,67 +132,52 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       );
       if (analyzeBtn) {
         analyzeBtn.click();
+      } else {
+        const form = document.querySelector('form');
+        if (form) form.submit();
       }
     });
 
-    // 3. Wait for Google analysis to complete and redirect to snapshot URL (/analysis/<slug>/<report-id>)
-    try {
-      await page.waitForFunction(
-        () => {
-          const pathParts = window.location.pathname.split('/');
-          const hasRedirect = pathParts.length >= 4 && !window.location.search.includes('url=');
-          const hasGauges = document.querySelectorAll('.lh-gauge__percentage').length >= 4;
-          return hasRedirect || hasGauges;
-        },
-        { timeout: 35000 }
-      );
-    } catch {
-      // If pathname hasn't redirected yet, loop below continues polling
+    // 3. Wait until the report finishes AND the browser URL updates to the permanent 10-character report ID:
+    await page.waitForFunction(
+      () => {
+        const parts = window.location.pathname.split('/').filter(Boolean);
+        // Must match /analysis/<site-slug>/<10-char-google-id> and NOT have ?url=
+        return (
+          parts[0] === 'analysis' &&
+          parts.length === 3 &&
+          parts[2].length >= 8 &&
+          !window.location.search.includes('url=')
+        );
+      },
+      { timeout: 55000 }
+    );
+
+    let mobileDetailUrl = page.url();
+    if (!mobileDetailUrl.includes('form_factor=mobile')) {
+      mobileDetailUrl += (mobileDetailUrl.includes('?') ? '&' : '?') + 'form_factor=mobile';
     }
 
-    let finalMobileUrl = '';
-    let mScores: number[] = [];
+    // Wait for the gauge percentages to render
+    await page.waitForSelector('.lh-gauge__percentage', { timeout: 25000 }).catch(() => {});
 
-    for (let i = 0; i < 16; i++) {
-      const currentUrl = page.url();
+    // Scrape Mobile scores
+    const mScores = await page.evaluate(() => {
+      const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
+      const visible = gauges.filter((g) => {
+        const r = g.getBoundingClientRect();
+        const text = (g.textContent || '').trim();
+        return (
+          r.width > 0 &&
+          r.height > 0 &&
+          window.getComputedStyle(g).display !== 'none' &&
+          text.length > 0
+        );
+      });
+      return visible.slice(0, 4).map((g) => parseInt((g.textContent || '').trim(), 10) || 0);
+    });
 
-      // Ensure currentUrl has redirected away from ?url= to static snapshot URL format: /analysis/<slug>/<report-id>
-      if ((currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) || i > 3) {
-        mScores = await page.evaluate(() => {
-          const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
-          const visible = gauges.filter((g) => {
-            const r = g.getBoundingClientRect();
-            const text = (g.textContent || '').trim();
-            return (
-              r.width > 0 &&
-              r.height > 0 &&
-              window.getComputedStyle(g).display !== 'none' &&
-              text.length > 0
-            );
-          });
-          return visible.slice(0, 4).map((g) => parseInt((g.textContent || '').trim(), 10) || 0);
-        });
-
-        if (mScores.length >= 4) {
-          finalMobileUrl = currentUrl.includes('form_factor=mobile')
-            ? currentUrl
-            : `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}form_factor=mobile`;
-          break;
-        }
-      }
-      await new Promise((r) => setTimeout(r, 1200));
-    }
-
-    if (!finalMobileUrl) {
-      const currentUrl = page.url();
-      if (currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) {
-        finalMobileUrl = currentUrl.includes('form_factor=mobile')
-          ? currentUrl
-          : `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}form_factor=mobile`;
-      }
-    }
-
-    if (mScores.length < 4 || !finalMobileUrl) {
+    if (mScores.length < 4 || !mobileDetailUrl) {
       throw new Error('Mobile audit timed out waiting for Google PageSpeed analysis and snapshot URL');
     }
 
@@ -267,36 +245,33 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       console.warn('Mobile card screenshot capture warning:', mErr);
     }
 
-    // 4. Switch to Desktop tab in-page
+    // 4. Click the Desktop tab (button[aria-label="Desktop"] or #desktop_tab), wait 1 second for form_factor=desktop in window.location.search, and capture const desktopDetailUrl = page.url();
     await page.evaluate(() => {
-      const tabs = Array.from(document.querySelectorAll('[role="tab"], button, span'));
-      const desktopTab = tabs.find(
-        (el) => el.textContent && el.textContent.trim() === 'Desktop' && el.closest('[role="tablist"]')
-      );
-      const clickTarget = (desktopTab ? desktopTab.closest('[role="tab"]') || desktopTab : null) as HTMLElement | null;
-      if (clickTarget) {
-        clickTarget.click();
-      } else {
-        const tab2 = document.querySelector('#desktop_tab') as HTMLElement | null;
-        if (tab2) tab2.click();
+      const desktopBtn =
+        document.querySelector('button[aria-label="Desktop"]') ||
+        document.querySelector('#desktop_tab') ||
+        Array.from(document.querySelectorAll('[role="tab"], button')).find(
+          (el) => el.textContent && el.textContent.trim().toLowerCase() === 'desktop'
+        );
+      if (desktopBtn) {
+        (desktopBtn as HTMLElement).click();
       }
     });
 
-    // Wait for desktop tab and URL update
     try {
       await page.waitForFunction(
         () => window.location.search.includes('form_factor=desktop'),
-        { timeout: 15000 }
+        { timeout: 10000 }
       );
     } catch {
-      // Continue to score scrape
+      // Continue
     }
 
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 1000));
 
-    let finalDesktopUrl = page.url();
-    if (!finalDesktopUrl.includes('form_factor=desktop') || finalDesktopUrl.includes('?url=')) {
-      finalDesktopUrl = finalMobileUrl.replace('form_factor=mobile', 'form_factor=desktop');
+    let desktopDetailUrl = page.url();
+    if (!desktopDetailUrl.includes('form_factor=desktop') || desktopDetailUrl.includes('?url=')) {
+      desktopDetailUrl = mobileDetailUrl.replace('form_factor=mobile', 'form_factor=desktop');
     }
 
     // Extract Desktop scores
@@ -410,8 +385,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: mScores[2] ?? 0,
         seo: mScores[3] ?? 0,
         totalBlockingTime: mTbt,
-        reportUrl: finalMobileUrl,
-        detailReportUrl: finalMobileUrl,
+        reportUrl: mobileDetailUrl,
+        detailReportUrl: mobileDetailUrl,
         screenshotUrl: mScreenUrl,
         screenshotDataUri: mScreenshotDataUri,
       },
@@ -421,8 +396,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: dScores[2] ?? 0,
         seo: dScores[3] ?? 0,
         totalBlockingTime: dTbt,
-        reportUrl: finalDesktopUrl,
-        detailReportUrl: finalDesktopUrl,
+        reportUrl: desktopDetailUrl,
+        detailReportUrl: desktopDetailUrl,
         screenshotUrl: dScreenUrl,
         screenshotDataUri: dScreenshotDataUri,
       },
