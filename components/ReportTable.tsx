@@ -261,14 +261,29 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
                       {item.mobile.screenshotUrl ? (
-                        <button
-                          type="button"
-                          onClick={() => openScreenshot(item, 'Mobile')}
-                          className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1.5 font-medium group"
-                        >
-                          <ImageIcon className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition" />
-                          <span className="truncate max-w-[150px]">View Screenshot</span>
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <a
+                            href={item.mobile.screenshotUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1.5 font-medium group text-xs"
+                            title={item.mobile.screenshotUrl}
+                          >
+                            <ImageIcon className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition flex-shrink-0" />
+                            <span className="truncate max-w-[130px]">
+                              {item.pageName || 'Home page'} - Mobile
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 flex-shrink-0" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => openScreenshot(item, 'Mobile')}
+                            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-0.5 rounded transition ml-auto"
+                            title="Quick preview in modal"
+                          >
+                            🔍
+                          </button>
+                        </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">-</span>
                       )}
@@ -396,14 +411,29 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
                       {item.desktop.screenshotUrl ? (
-                        <button
-                          type="button"
-                          onClick={() => openScreenshot(item, 'Desktop')}
-                          className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1.5 font-medium group"
-                        >
-                          <ImageIcon className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition" />
-                          <span className="truncate max-w-[150px]">View Screenshot</span>
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <a
+                            href={item.desktop.screenshotUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 underline flex items-center gap-1.5 font-medium group text-xs"
+                            title={item.desktop.screenshotUrl}
+                          >
+                            <ImageIcon className="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition flex-shrink-0" />
+                            <span className="truncate max-w-[130px]">
+                              {item.pageName || 'Home page'} - Desktop
+                            </span>
+                            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-blue-600 flex-shrink-0" />
+                          </a>
+                          <button
+                            type="button"
+                            onClick={() => openScreenshot(item, 'Desktop')}
+                            className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-0.5 rounded transition ml-auto"
+                            title="Quick preview in modal"
+                          >
+                            🔍
+                          </button>
+                        </div>
                       ) : (
                         <span className="text-slate-400 italic text-[11px]">-</span>
                       )}

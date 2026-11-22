@@ -187,7 +187,7 @@ export async function runPageSpeedAudit(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '') || 'page';
     const auditId = `${pageSlug}-${Date.now()}-${strategy}`;
-    saveScreenshot(auditId, cardDataUri);
+    const uploadedUrl = await saveScreenshot(auditId, cardDataUri, `${pageName} - ${strategy}`);
 
     const queryParams = new URLSearchParams({
       url,
@@ -202,7 +202,9 @@ export async function runPageSpeedAudit(
       cls,
       si: speedIndex,
     });
-    const screenshotUrl = `/api/screenshot/${auditId}?${queryParams.toString()}`;
+    const screenshotUrl = uploadedUrl && (uploadedUrl.startsWith('http://') || uploadedUrl.startsWith('https://'))
+      ? uploadedUrl
+      : `/api/screenshot/${auditId}?${queryParams.toString()}`;
 
     const reportUrl = buildPageSpeedSnapshotUrl(url, strategy);
 

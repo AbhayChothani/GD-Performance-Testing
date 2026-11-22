@@ -329,10 +329,10 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       .replace(/^-|-$/g, '') || 'page';
     const auditId = `${pageSlug}-${Date.now()}`;
     const mScreenUrl = mScreenshotDataUri
-      ? saveScreenshot(`${auditId}-mobile`, mScreenshotDataUri)
+      ? await saveScreenshot(`${auditId}-mobile`, mScreenshotDataUri, `${pageName} - Mobile`)
       : `https://image.thum.io/get/width/1200/crop/800/${targetUrl}`;
     const dScreenUrl = dScreenshotDataUri
-      ? saveScreenshot(`${auditId}-desktop`, dScreenshotDataUri)
+      ? await saveScreenshot(`${auditId}-desktop`, dScreenshotDataUri, `${pageName} - Desktop`)
       : `https://image.thum.io/get/width/1200/crop/800/${targetUrl}`;
 
     return {
