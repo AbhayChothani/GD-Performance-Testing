@@ -187,11 +187,34 @@ export async function runPageSpeedAudit(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '') || 'page';
     const auditId = `${pageSlug}-${Date.now()}-${strategy}`;
-    const uploadedUrl = await saveScreenshot(auditId, cardDataUri, `${pageName} - ${strategy}`);
+    const uploadedUrl = await saveScreenshot(
+      auditId,
+      cardDataUri,
+      `${pageName} - ${strategy}`,
+      webScreenshotDataUri
+    );
 
-    const screenshotUrl = uploadedUrl && (uploadedUrl.startsWith('http://') || uploadedUrl.startsWith('https://'))
-      ? uploadedUrl
-      : `https://image.thum.io/get/width/1200/crop/800/${url}`;
+    const queryParams = new URLSearchParams({
+      url,
+      strategy,
+      p: String(performance),
+      a: String(accessibility),
+      b: String(bestPractices),
+      s: String(seo),
+      tbt: tbtDisplay,
+      fcp,
+      lcp,
+      cls,
+      si: speedIndex,
+    });
+    const fallbackLocalEndpoint = `/api/screenshot/${auditId}?${queryParams.toString()}`;
+
+    const screenshotUrl =
+      uploadedUrl && (uploadedUrl.startsWith('http://') || uploadedUrl.startsWith('https://'))
+        ? uploadedUrl
+        : uploadedUrl && uploadedUrl.startsWith('/api/screenshot/')
+        ? `${uploadedUrl}?${queryParams.toString()}`
+        : fallbackLocalEndpoint;
 
     const directDetailUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=${strategy.toLowerCase()}`;
 

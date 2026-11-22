@@ -138,15 +138,16 @@ export async function uploadScreenshotToImgBB(
 export async function saveScreenshot(
   id: string,
   dataUri: string,
-  title?: string
+  title?: string,
+  imageToUpload?: string
 ): Promise<string> {
   const cleanId = id.replace(/\.(jpg|jpeg|png|svg)$/i, '');
 
   // Always cache locally as instant fallback
   const localUrl = saveScreenshotLocal(cleanId, dataUri);
 
-  // Upload to ImgBB cloud using URLSearchParams
-  const cloudUrl = await uploadScreenshotToImgBB(dataUri, title);
+  // Upload to ImgBB cloud (prioritize JPEG imageToUpload if available, since ImgBB rejects SVG)
+  const cloudUrl = await uploadScreenshotToImgBB(imageToUpload || dataUri, title);
   if (cloudUrl) {
     return cloudUrl;
   }

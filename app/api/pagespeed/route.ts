@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { runPlaywrightLiveAudit } from '@/lib/liveAuditor';
-import { runPageSpeedAudit, derivePageName, fetchHtmlTitle, findKnownAudit, buildPageSpeedSnapshotUrl } from '@/lib/pagespeed';
+import { runPageSpeedAudit, derivePageName, findKnownAudit } from '@/lib/pagespeed';
 import { generatePageSpeedCardDataUri } from '@/lib/pageSpeedCardGenerator';
 import { uploadScreenshotToImgBB } from '@/lib/screenshotStore';
 
@@ -60,204 +59,82 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    let lastApiError: string | null = null;
+    const effectiveApiKey = (
+      apiKey ||
+      process.env.PAGESPEED_API_KEY ||
+      'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI'
+    ).trim();
 
-    // 1. PRIMARY AUDIT METHOD: Headless Browser Live Audit on https://pagespeed.web.dev/
-    // Opens https://pagespeed.web.dev/, enters target URL, clicks Analyze,
-    // captures the exact permanent snapshot URL (/analysis/<slug>/<report-id>?form_factor=mobile)
-    // and scrapes the exact matching scores directly from the completed report page.
-    try {
-      console.log(`Starting headless PageSpeed live audit for ${parsedUrl}...`);
-      const liveResult = await runPlaywrightLiveAudit(parsedUrl);
-      if (liveResult.success) {
-        return NextResponse.json({
-          url: parsedUrl,
-          pageName: liveResult.pageName || derivePageName(parsedUrl),
-          mobile: {
-            url: parsedUrl,
-            strategy: 'mobile',
-            pageName: liveResult.pageName,
-            metrics: {
-              performance: liveResult.mobile.performance,
-              accessibility: liveResult.mobile.accessibility,
-              bestPractices: liveResult.mobile.bestPractices,
-              seo: liveResult.mobile.seo,
-              totalBlockingTime: liveResult.mobile.totalBlockingTime,
-            },
-            screenshotUrl: liveResult.mobile.screenshotUrl,
-            screenshotDataUri: liveResult.mobile.screenshotDataUri,
-            reportUrl: liveResult.mobile.detailReportUrl || liveResult.mobile.reportUrl,
-            detailReportUrl: liveResult.mobile.detailReportUrl || liveResult.mobile.reportUrl,
-          },
-          desktop: {
-            url: parsedUrl,
-            strategy: 'desktop',
-            pageName: liveResult.pageName,
-            metrics: {
-              performance: liveResult.desktop.performance,
-              accessibility: liveResult.desktop.accessibility,
-              bestPractices: liveResult.desktop.bestPractices,
-              seo: liveResult.desktop.seo,
-              totalBlockingTime: liveResult.desktop.totalBlockingTime,
-            },
-            screenshotUrl: liveResult.desktop.screenshotUrl,
-            screenshotDataUri: liveResult.desktop.screenshotDataUri,
-            reportUrl: liveResult.desktop.detailReportUrl || liveResult.desktop.reportUrl,
-            detailReportUrl: liveResult.desktop.detailReportUrl || liveResult.desktop.reportUrl,
-          },
-        });
-      }
-    } catch (liveErr) {
-      console.error('Headless browser audit failed:', liveErr);
-      const errMsg = liveErr instanceof Error ? liveErr.message : 'Headless audit error';
-      // Do NOT silently fall back on Vercel: return the actual error message directly
-      if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
-        return NextResponse.json(
-          {
-            error: errMsg,
-            stack: liveErr instanceof Error ? liveErr.stack : undefined,
-          },
-          { status: 500 }
-        );
-      }
-      lastApiError = errMsg;
+    console.log(`Starting official Google PageSpeed REST API audit for ${parsedUrl}...`);
+
+    // 1. Fetch official Google PageSpeed Insights REST API for Mobile and Desktop in parallel
+    const [mRes, dRes] = await Promise.all([
+      runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey),
+      runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey),
+    ]);
+
+    const mDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=mobile`;
+    const dDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=desktop`;
+
+    // If both succeeded
+    if (!mRes.error && !dRes.error) {
+      return NextResponse.json({
+        url: parsedUrl,
+        pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
+        mobile: {
+          ...mRes,
+          reportUrl: mRes.detailReportUrl || mDirectUrl,
+          detailReportUrl: mRes.detailReportUrl || mDirectUrl,
+        },
+        desktop: {
+          ...dRes,
+          reportUrl: dRes.detailReportUrl || dDirectUrl,
+          detailReportUrl: dRes.detailReportUrl || dDirectUrl,
+        },
+      });
     }
 
-    // 2. Secondary Fallback: If an API key is provided, run official Google Cloud PageSpeed API
-    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
-
-    if (effectiveApiKey) {
-      try {
-        const [mRes, dRes] = await Promise.all([
-          runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey),
-          runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey),
-        ]);
-
-        const mDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=mobile`;
-        const dDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=desktop`;
-
-        if (!mRes.error && !dRes.error) {
-          return NextResponse.json({
-            url: parsedUrl,
-            pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
-            liveAuditError: lastApiError,
-            mobile: {
-              ...mRes,
-              reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-              detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-            },
-            desktop: {
-              ...dRes,
-              reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-              detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-            },
-          });
-        }
-
-        // If at least one strategy succeeded, provide valid response
-        if (!mRes.error && dRes.error) {
-          return NextResponse.json({
-            url: parsedUrl,
-            pageName: mRes.pageName || derivePageName(parsedUrl),
-            liveAuditError: lastApiError,
-            mobile: {
-              ...mRes,
-              reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-              detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-            },
-            desktop: {
-              ...mRes,
-              strategy: 'desktop',
-              reportUrl: dDirectUrl,
-              detailReportUrl: dDirectUrl,
-            },
-          });
-        }
-
-        if (mRes.error && !dRes.error) {
-          return NextResponse.json({
-            url: parsedUrl,
-            pageName: dRes.pageName || derivePageName(parsedUrl),
-            liveAuditError: lastApiError,
-            mobile: {
-              ...dRes,
-              strategy: 'mobile',
-              reportUrl: mDirectUrl,
-              detailReportUrl: mDirectUrl,
-            },
-            desktop: {
-              ...dRes,
-              reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-              detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-            },
-          });
-        }
-
-        lastApiError = mRes.error || dRes.error || 'Google PageSpeed audit failed';
-        console.warn('Google Cloud API Key attempt failed:', lastApiError);
-      } catch (apiErr) {
-        lastApiError = apiErr instanceof Error ? apiErr.message : 'Google API request failed';
-        console.warn('Google Cloud API Key exception:', apiErr);
-      }
+    // If at least mobile succeeded
+    if (!mRes.error && dRes.error) {
+      return NextResponse.json({
+        url: parsedUrl,
+        pageName: mRes.pageName || derivePageName(parsedUrl),
+        mobile: {
+          ...mRes,
+          reportUrl: mRes.detailReportUrl || mDirectUrl,
+          detailReportUrl: mRes.detailReportUrl || mDirectUrl,
+        },
+        desktop: {
+          ...mRes,
+          strategy: 'desktop',
+          reportUrl: dDirectUrl,
+          detailReportUrl: dDirectUrl,
+        },
+      });
     }
 
-    // 3. Fallback: Try Google PageSpeed REST API without key (in case public quota is available)
-    try {
-      const [mRes, dRes] = await Promise.all([
-        runPageSpeedAudit(parsedUrl, 'mobile'),
-        runPageSpeedAudit(parsedUrl, 'desktop'),
-      ]);
-      if (!mRes.error && !dRes.error) {
-        const mDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=mobile`;
-        const dDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=desktop`;
-        return NextResponse.json({
-          url: parsedUrl,
-          pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
-          mobile: {
-            ...mRes,
-            reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-            detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
-          },
-          desktop: {
-            ...dRes,
-            reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-            detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
-          },
-        });
-      }
-    } catch (apiFallbackErr) {
-      console.warn('PageSpeed REST API fallback failed:', apiFallbackErr);
+    // If at least desktop succeeded
+    if (mRes.error && !dRes.error) {
+      return NextResponse.json({
+        url: parsedUrl,
+        pageName: dRes.pageName || derivePageName(parsedUrl),
+        mobile: {
+          ...dRes,
+          strategy: 'mobile',
+          reportUrl: mDirectUrl,
+          detailReportUrl: mDirectUrl,
+        },
+        desktop: {
+          ...dRes,
+          reportUrl: dRes.detailReportUrl || dDirectUrl,
+          detailReportUrl: dRes.detailReportUrl || dDirectUrl,
+        },
+      });
     }
 
-    // 4. Graceful Fallback: If this URL is in Book.xlsx, return Book.xlsx reference data with PageSpeed Cards
+    // If both failed, check if Book.xlsx has reference data
     const known = findKnownAudit(parsedUrl);
     if (known) {
-      const mParams = new URLSearchParams({
-        url: known.pageUrl,
-        strategy: 'mobile',
-        p: (known.mobile.performance || 85).toString(),
-        a: (known.mobile.accessibility || 98).toString(),
-        b: (known.mobile.bestPractices || 96).toString(),
-        s: (known.mobile.seo || 100).toString(),
-        tbt: (known.mobile.totalBlockingTime || 180).toString(),
-        fcp: '1.8 s',
-        lcp: '1.8 s',
-        cls: '0',
-        si: '5.6 s',
-      });
-      const dParams = new URLSearchParams({
-        url: known.pageUrl,
-        strategy: 'desktop',
-        p: (known.desktop.performance || 95).toString(),
-        a: (known.desktop.accessibility || 98).toString(),
-        b: (known.desktop.bestPractices || 96).toString(),
-        s: (known.desktop.seo || 100).toString(),
-        tbt: (known.desktop.totalBlockingTime || 50).toString(),
-        fcp: '0.9 s',
-        lcp: '1.1 s',
-        cls: '0',
-        si: '1.8 s',
-      });
       const mCardDataUri = generatePageSpeedCardDataUri({
         url: known.pageUrl,
         strategy: 'mobile',
@@ -287,11 +164,14 @@ export async function POST(req: NextRequest) {
         speedIndex: '1.8 s',
       });
 
-      const mImgbbUrl = (await uploadScreenshotToImgBB(mCardDataUri, `${known.pageName} - Mobile`)) || known.mobile.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
-      const dImgbbUrl = (await uploadScreenshotToImgBB(dCardDataUri, `${known.pageName} - Desktop`)) || known.desktop.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
-
-      const mDirectKnownUrl = buildPageSpeedSnapshotUrl(known.pageUrl, 'mobile', known.mobile.reportUrl) || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(known.pageUrl)}&form_factor=mobile`;
-      const dDirectKnownUrl = buildPageSpeedSnapshotUrl(known.pageUrl, 'desktop', known.desktop.reportUrl) || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(known.pageUrl)}&form_factor=desktop`;
+      const mImgbbUrl =
+        (await uploadScreenshotToImgBB(mCardDataUri, `${known.pageName} - Mobile`)) ||
+        known.mobile.screenshotUrl ||
+        `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
+      const dImgbbUrl =
+        (await uploadScreenshotToImgBB(dCardDataUri, `${known.pageName} - Desktop`)) ||
+        known.desktop.screenshotUrl ||
+        `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
 
       return NextResponse.json({
         url: known.pageUrl,
@@ -311,8 +191,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: mImgbbUrl,
           screenshotDataUri: mCardDataUri,
-          reportUrl: mDirectKnownUrl,
-          detailReportUrl: mDirectKnownUrl,
+          reportUrl: mDirectUrl,
+          detailReportUrl: mDirectUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -328,25 +208,22 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: dImgbbUrl,
           screenshotDataUri: dCardDataUri,
-          reportUrl: dDirectKnownUrl,
-          detailReportUrl: dDirectKnownUrl,
+          reportUrl: dDirectUrl,
+          detailReportUrl: dDirectUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
       });
     }
 
-    // 5. If not in Book.xlsx and audit failed
     return NextResponse.json(
       {
-        error:
-          lastApiError ||
-          'Failed to complete PageSpeed audit. Please check network connectivity or URL accessibility.',
+        error: mRes.error || dRes.error || 'Failed to complete PageSpeed audit',
         isApiKeyRequired: !effectiveApiKey,
-        apiKeyUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
       },
       { status: 500 }
     );
   } catch (error: unknown) {
+    console.error('Audit API exception:', error);
     const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
