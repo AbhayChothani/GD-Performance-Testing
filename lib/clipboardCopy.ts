@@ -1,5 +1,6 @@
 import { PageAuditItem, ReportMetadata } from './types';
 import { toAbsoluteUrl } from './excelExport';
+import { buildPageSpeedSnapshotUrl } from './pageSpeedUtils';
 
 function getScoreInlineStyle(score: number | null): string {
   if (score === null || score === undefined) return '';
@@ -51,9 +52,9 @@ export async function copyForGoogleSheets(
   items.forEach((item) => {
     const pageLabel = item.pageName?.trim() || 'Home page';
     const mScreenshot = toAbsoluteUrl(item.mobile.screenshotUrl);
-    const mReport = toAbsoluteUrl(item.mobile.reportUrl);
+    const mReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'mobile', item.mobile.reportUrl);
     const dScreenshot = toAbsoluteUrl(item.desktop.screenshotUrl);
-    const dReport = toAbsoluteUrl(item.desktop.reportUrl);
+    const dReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'desktop', item.desktop.reportUrl);
 
     const mLabel = `${pageLabel} - Mobile`;
     const dLabel = `${pageLabel} - Desktop`;
@@ -118,9 +119,9 @@ export async function copyForGoogleSheets(
   items.forEach((item) => {
     const pageLabel = item.pageName?.trim() || 'Home page';
     const mScreenshot = toAbsoluteUrl(item.mobile.screenshotUrl);
-    const mReport = toAbsoluteUrl(item.mobile.reportUrl);
+    const mReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'mobile', item.mobile.reportUrl);
     const dScreenshot = toAbsoluteUrl(item.desktop.screenshotUrl);
-    const dReport = toAbsoluteUrl(item.desktop.reportUrl);
+    const dReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'desktop', item.desktop.reportUrl);
 
     const mLabel = `${pageLabel} - Mobile`;
     const dLabel = `${pageLabel} - Desktop`;

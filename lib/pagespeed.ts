@@ -2,6 +2,9 @@ import { PageSpeedApiResponse } from './types';
 import { saveScreenshot } from './screenshotStore';
 import { DEMO_ITEMS } from './demoData';
 import { generatePageSpeedCardDataUri } from './pageSpeedCardGenerator';
+import { buildPageSpeedSnapshotUrl, buildPageSpeedReportUrl } from './pageSpeedUtils';
+
+export { buildPageSpeedSnapshotUrl, buildPageSpeedReportUrl };
 
 export function normalizeUrl(url: string): string {
   try {
@@ -103,7 +106,7 @@ export async function runPageSpeedAudit(
     apiUrl.searchParams.set('key', apiKey);
   }
 
-  const reportUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=${strategy}`;
+  const reportUrl = buildPageSpeedSnapshotUrl(url, strategy);
   const fallbackScreenshotUrl = `https://image.thum.io/get/width/1200/crop/800/${url}`;
 
   try {
@@ -201,21 +204,7 @@ export async function runPageSpeedAudit(
     });
     const screenshotUrl = `/api/screenshot/${auditId}?${queryParams.toString()}`;
 
-    const reportParams = new URLSearchParams({
-      url,
-      strategy,
-      name: pageName,
-      p: performance.toString(),
-      a: accessibility.toString(),
-      b: bestPractices.toString(),
-      s: seo.toString(),
-      tbt: tbtDisplay,
-      fcp,
-      lcp,
-      cls,
-      si: speedIndex,
-    });
-    const reportUrl = `/report?${reportParams.toString()}`;
+    const reportUrl = buildPageSpeedSnapshotUrl(url, strategy);
 
     return {
       url,
@@ -246,7 +235,7 @@ export async function runPageSpeedAudit(
         totalBlockingTime: 0,
       },
       screenshotUrl: fallbackScreenshotUrl,
-      reportUrl,
+      reportUrl: buildPageSpeedSnapshotUrl(url, strategy),
       error: errMessage,
     };
   }

@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { PageAuditItem, ReportMetadata } from './types';
+import { buildPageSpeedSnapshotUrl } from './pageSpeedUtils';
 
 export const HEADER_BG_COLOR = 'FFB7E1CD'; // Light mint/teal
 export const GREEN_BG_COLOR = 'FF38761D';  // Google Lighthouse 90-100 green
@@ -249,14 +250,14 @@ export async function generateExcelWorkbook(
     mRow.getCell(10).alignment = { horizontal: 'left', vertical: 'middle' };
     mRow.getCell(10).border = thinBorder;
 
-    // Link for Detail Description
-    const mobileReport = toAbsoluteUrl(item.mobile.reportUrl, origin);
+    // Link for Detail Description (Mobile)
+    const mobileReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'mobile', item.mobile.reportUrl);
     if (mobileReport) {
       mRow.getCell(11).value = {
         text: mobileReport,
         hyperlink: mobileReport,
       };
-      mRow.getCell(11).font = { underline: true, color: { argb: 'FF0000FF' } };
+      mRow.getCell(11).font = { name: 'Calibri', size: 10, underline: true, color: { argb: 'FF0000FF' } };
     } else {
       mRow.getCell(11).value = '';
     }
@@ -328,14 +329,14 @@ export async function generateExcelWorkbook(
     dRow.getCell(10).alignment = { horizontal: 'left', vertical: 'middle' };
     dRow.getCell(10).border = thinBorder;
 
-    // Link for Detail Description
-    const desktopReport = toAbsoluteUrl(item.desktop.reportUrl, origin);
+    // Link for Detail Description (Desktop)
+    const desktopReport = buildPageSpeedSnapshotUrl(item.pageUrl, 'desktop', item.desktop.reportUrl);
     if (desktopReport) {
       dRow.getCell(11).value = {
         text: desktopReport,
         hyperlink: desktopReport,
       };
-      dRow.getCell(11).font = { underline: true, color: { argb: 'FF0000FF' } };
+      dRow.getCell(11).font = { name: 'Calibri', size: 10, underline: true, color: { argb: 'FF0000FF' } };
     } else {
       dRow.getCell(11).value = '';
     }

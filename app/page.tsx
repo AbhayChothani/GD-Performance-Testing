@@ -10,6 +10,7 @@ import { ReportTable } from '@/components/ReportTable';
 import { DEFAULT_METADATA, DEMO_ITEMS, DEMO_URLS } from '@/lib/demoData';
 import { PageAuditItem, ReportMetadata, BatchProgress, ScreenType } from '@/lib/types';
 import { toAbsoluteUrl } from '@/lib/excelExport';
+import { buildPageSpeedSnapshotUrl } from '@/lib/pageSpeedUtils';
 
 export default function HomePage() {
   const [metadata, setMetadata] = useState<ReportMetadata>(DEFAULT_METADATA);
@@ -73,7 +74,7 @@ export default function HomePage() {
           seo: null,
           totalBlockingTime: null,
           screenshotUrl: null,
-          reportUrl: `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(u)}&form_factor=mobile`,
+          reportUrl: buildPageSpeedSnapshotUrl(u, 'mobile'),
           comment: '',
           status: 'pending',
         },
@@ -85,7 +86,7 @@ export default function HomePage() {
           seo: null,
           totalBlockingTime: null,
           screenshotUrl: null,
-          reportUrl: `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(u)}&form_factor=desktop`,
+          reportUrl: buildPageSpeedSnapshotUrl(u, 'desktop'),
           comment: '',
           status: 'pending',
         },
@@ -162,7 +163,7 @@ export default function HomePage() {
                 totalBlockingTime: mMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.mobile?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.mobile?.screenshotDataUri,
-                reportUrl: data.mobile?.reportUrl || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=mobile`,
+                reportUrl: data.mobile?.reportUrl || buildPageSpeedSnapshotUrl(currentUrl, 'mobile'),
                 comment: '',
                 status: 'completed',
               },
@@ -175,7 +176,7 @@ export default function HomePage() {
                 totalBlockingTime: dMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.desktop?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.desktop?.screenshotDataUri,
-                reportUrl: data.desktop?.reportUrl || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=desktop`,
+                reportUrl: data.desktop?.reportUrl || buildPageSpeedSnapshotUrl(currentUrl, 'desktop'),
                 comment: '',
                 status: 'completed',
               },
@@ -249,6 +250,7 @@ export default function HomePage() {
               totalBlockingTime: data.mobile?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.mobile?.screenshotUrl || item.mobile.screenshotUrl,
               screenshotDataUri: data.mobile?.screenshotDataUri || item.mobile.screenshotDataUri,
+              reportUrl: data.mobile?.reportUrl || buildPageSpeedSnapshotUrl(url, 'mobile', item.mobile.reportUrl),
             },
             desktop: {
               ...item.desktop,
@@ -259,6 +261,7 @@ export default function HomePage() {
               totalBlockingTime: data.desktop?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.desktop?.screenshotUrl || item.desktop.screenshotUrl,
               screenshotDataUri: data.desktop?.screenshotDataUri || item.desktop.screenshotDataUri,
+              reportUrl: data.desktop?.reportUrl || buildPageSpeedSnapshotUrl(url, 'desktop', item.desktop.reportUrl),
             },
           };
         })
@@ -333,7 +336,9 @@ export default function HomePage() {
             tbt: tbtVal,
           });
 
-          updatedMetrics.reportUrl = `/report?${reportParams.toString()}`;
+          if (!updatedMetrics.reportUrl || !updatedMetrics.reportUrl.startsWith('https://pagespeed.web.dev/analysis')) {
+            updatedMetrics.reportUrl = buildPageSpeedSnapshotUrl(item.pageUrl, targetStrategy, currentMetrics.reportUrl);
+          }
           const currentScrUrl = currentMetrics.screenshotUrl || '';
           const baseScr = currentScrUrl.split('?')[0] || `/api/screenshot/audit-${targetStrategy}`;
           updatedMetrics.screenshotUrl = `${baseScr}?${reportParams.toString()}`;

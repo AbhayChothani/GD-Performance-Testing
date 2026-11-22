@@ -911,7 +911,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 110,
       "screenshotUrl": "https://prnt.sc/3R7AwHrpnrcr",
-      "reportUrl": "`https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-csr/nf8gpq1xvf?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-csr/nf8gpq1xvf?form_factor=desktop",
       "comment": "",
       "status": "completed"
     },

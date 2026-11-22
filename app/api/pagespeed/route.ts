@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runPlaywrightLiveAudit } from '@/lib/liveAuditor';
-import { runPageSpeedAudit, derivePageName, fetchHtmlTitle, findKnownAudit } from '@/lib/pagespeed';
+import { runPageSpeedAudit, derivePageName, fetchHtmlTitle, findKnownAudit, buildPageSpeedSnapshotUrl } from '@/lib/pagespeed';
 import { generatePageSpeedCardDataUri } from '@/lib/pageSpeedCardGenerator';
 
 export const dynamic = 'force-dynamic';
@@ -246,10 +246,7 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: `/api/screenshot/audit-ref-mobile?${mParams.toString()}`,
           screenshotDataUri: mCardDataUri,
-          reportUrl:
-            known.mobile.reportUrl && known.mobile.reportUrl.includes('/hg2pah6wia')
-              ? known.mobile.reportUrl
-              : `/report?${mParams.toString()}&name=${encodeURIComponent(known.pageName)}`,
+          reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'mobile', known.mobile.reportUrl),
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -265,10 +262,7 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: `/api/screenshot/audit-ref-desktop?${dParams.toString()}`,
           screenshotDataUri: dCardDataUri,
-          reportUrl:
-            known.desktop.reportUrl && known.desktop.reportUrl.includes('/hg2pah6wia')
-              ? known.desktop.reportUrl
-              : `/report?${dParams.toString()}&name=${encodeURIComponent(known.pageName)}`,
+          reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'desktop', known.desktop.reportUrl),
           comment: 'Reference audit data (Book.xlsx)',
         },
       });

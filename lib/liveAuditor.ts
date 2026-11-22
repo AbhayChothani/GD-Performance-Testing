@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { saveScreenshot } from './screenshotStore';
 import { derivePageName, fetchHtmlTitle } from './pagespeed';
+import { buildPageSpeedSnapshotUrl } from './pageSpeedUtils';
 
 export interface LiveAuditOutput {
   success: boolean;
@@ -292,7 +293,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       console.warn('Desktop card screenshot capture warning:', dErr);
     }
 
-    const analyzedDesktopUrl = analyzedMobileUrl.replace('form_factor=mobile', 'form_factor=desktop');
+    const analyzedDesktopUrl = buildPageSpeedSnapshotUrl(targetUrl, 'desktop', analyzedMobileUrl);
+    const finalMobileUrl = buildPageSpeedSnapshotUrl(targetUrl, 'mobile', analyzedMobileUrl);
     const pageSlug = (pageName || 'page')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -315,7 +317,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: mScores[2] ?? 0,
         seo: mScores[3] ?? 0,
         totalBlockingTime: mTbt,
-        reportUrl: analyzedMobileUrl,
+        reportUrl: finalMobileUrl,
         screenshotUrl: mScreenUrl,
         screenshotDataUri: mScreenshotDataUri,
       },
