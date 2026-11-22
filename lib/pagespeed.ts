@@ -1,6 +1,7 @@
 import { PageSpeedApiResponse } from './types';
 import { saveScreenshot } from './screenshotStore';
 import { DEMO_ITEMS } from './demoData';
+import { generatePageSpeedCardDataUri } from './pageSpeedCardGenerator';
 
 export function normalizeUrl(url: string): string {
   try {
@@ -150,16 +151,55 @@ export async function runPageSpeedAudit(
     const seo = Math.round((categories.seo?.score ?? 0) * 100);
     const totalBlockingTime = Math.round(audits['total-blocking-time']?.numericValue ?? 0);
 
+    const fcp = (audits['first-contentful-paint']?.displayValue || '1.8 s').replace(/\s+/g, ' ');
+    const lcp = (audits['largest-contentful-paint']?.displayValue || '1.8 s').replace(/\s+/g, ' ');
+    const tbtDisplay = audits['total-blocking-time']?.displayValue || `${totalBlockingTime} ms`;
+    const cls = (audits['cumulative-layout-shift']?.displayValue || '0').replace(/\s+/g, ' ');
+    const speedIndex = (audits['speed-index']?.displayValue || '5.6 s').replace(/\s+/g, ' ');
+
     const docTitle = audits['document-title']?.details?.title || null;
     const pageName = derivePageName(url, docTitle);
 
-    const screenshotDataUri: string | undefined = audits['final-screenshot']?.details?.data;
-    let screenshotUrl = fallbackScreenshotUrl;
+    const webScreenshotDataUri: string | undefined = audits['final-screenshot']?.details?.data;
 
-    if (screenshotDataUri) {
-      const auditId = `audit-${Date.now()}-${Math.random().toString(36).substring(2, 8)}-${strategy}`;
-      screenshotUrl = saveScreenshot(auditId, screenshotDataUri);
-    }
+    // Generate the authentic Google PageSpeed Report Card SVG (matching image.png)
+    const cardDataUri = generatePageSpeedCardDataUri({
+      url,
+      strategy,
+      pageName,
+      performance,
+      accessibility,
+      bestPractices,
+      seo,
+      totalBlockingTime: tbtDisplay,
+      firstContentfulPaint: fcp,
+      largestContentfulPaint: lcp,
+      cumulativeLayoutShift: cls,
+      speedIndex,
+      screenshotDataUri: webScreenshotDataUri,
+    });
+
+    const pageSlug = (pageName || 'page')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'page';
+    const auditId = `${pageSlug}-${Date.now()}-${strategy}`;
+    saveScreenshot(auditId, cardDataUri);
+
+    const queryParams = new URLSearchParams({
+      url,
+      strategy,
+      p: performance.toString(),
+      a: accessibility.toString(),
+      b: bestPractices.toString(),
+      s: seo.toString(),
+      tbt: totalBlockingTime.toString(),
+      fcp,
+      lcp,
+      cls,
+      si: speedIndex,
+    });
+    const screenshotUrl = `/api/screenshot/${auditId}?${queryParams.toString()}`;
 
     return {
       url,
@@ -172,7 +212,7 @@ export async function runPageSpeedAudit(
         seo,
         totalBlockingTime,
       },
-      screenshotDataUri,
+      screenshotDataUri: cardDataUri,
       screenshotUrl,
       reportUrl,
     };

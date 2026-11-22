@@ -27,6 +27,7 @@ export const ScreenshotModal: React.FC<ScreenshotModalProps> = ({
 
   const imgSrc = screenshotDataUri || screenshotUrl || '';
   const isMobile = screenType === 'Mobile';
+  const fileExt = imgSrc.startsWith('data:image/svg+xml') || imgSrc.includes('.svg') ? 'svg' : 'jpg';
 
   return (
     <div
@@ -66,11 +67,11 @@ export const ScreenshotModal: React.FC<ScreenshotModalProps> = ({
             {imgSrc && (
               <a
                 href={imgSrc}
-                download={`${pageName.replace(/[^a-zA-Z0-9]/g, '_')}_${screenType}.jpg`}
+                download={`${pageName.replace(/[^a-zA-Z0-9]/g, '_')}_${screenType}.${fileExt}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-200 transition"
-                title="Open image"
+                title="Download report card image"
               >
                 <Download className="w-5 h-5" />
               </a>

@@ -34,7 +34,7 @@ export const screenshotStore = globalStore.__screenshotStore;
 
 export function saveScreenshot(id: string, dataUri: string): string {
   try {
-    const cleanId = id.replace(/\.(jpg|jpeg|png)$/i, '');
+    const cleanId = id.replace(/\.(jpg|jpeg|png|svg)$/i, '');
     const matches = dataUri.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     if (matches && matches.length === 3) {
       const contentType = matches[1];
@@ -49,7 +49,7 @@ export function saveScreenshot(id: string, dataUri: string): string {
       screenshotStore.set(id, item);
 
       // Persist to disk (public/screenshots or /tmp/screenshots for Vercel)
-      const ext = contentType.includes('png') ? 'png' : 'jpg';
+      const ext = contentType.includes('svg') ? 'svg' : contentType.includes('png') ? 'png' : 'jpg';
       let saved = false;
       try {
         ensureDirExists(SCREENSHOT_DIR);
@@ -79,7 +79,7 @@ export function saveScreenshot(id: string, dataUri: string): string {
 }
 
 export function getScreenshot(id: string): StoredScreenshot | undefined {
-  const cleanId = id.replace(/\.(jpg|jpeg|png)$/i, '');
+  const cleanId = id.replace(/\.(jpg|jpeg|png|svg)$/i, '');
 
   if (screenshotStore.has(cleanId)) {
     return screenshotStore.get(cleanId);
@@ -92,12 +92,16 @@ export function getScreenshot(id: string): StoredScreenshot | undefined {
   const candidateDirs = [SCREENSHOT_DIR, TMP_SCREENSHOT_DIR];
   for (const dir of candidateDirs) {
     try {
+      const svgPath = path.join(dir, `${cleanId}.svg`);
       const jpgPath = path.join(dir, `${cleanId}.jpg`);
       const pngPath = path.join(dir, `${cleanId}.png`);
       let filePath: string | null = null;
       let contentType = 'image/jpeg';
 
-      if (fs.existsSync(jpgPath)) {
+      if (fs.existsSync(svgPath)) {
+        filePath = svgPath;
+        contentType = 'image/svg+xml';
+      } else if (fs.existsSync(jpgPath)) {
         filePath = jpgPath;
         contentType = 'image/jpeg';
       } else if (fs.existsSync(pngPath)) {
