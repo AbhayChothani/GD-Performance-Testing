@@ -51,7 +51,7 @@ export function toAbsoluteUrl(url?: string | null, origin?: string): string {
     base = `https://${process.env.VERCEL_URL}`;
   }
   if (!base) {
-    base = 'http://localhost:3001';
+    base = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : '';
   }
   base = base.replace(/\/+$/, '');
   const path = url.startsWith('/') ? url : `/${url}`;
@@ -371,7 +371,7 @@ export async function exportToExcelFile(
   } else if (process.env.VERCEL_URL) {
     origin = `https://${process.env.VERCEL_URL}`;
   } else {
-    origin = 'http://localhost:3001';
+    origin = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : '';
   }
   origin = origin.replace(/\/+$/, '');
 

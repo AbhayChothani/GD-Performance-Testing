@@ -339,9 +339,9 @@ export default function HomePage() {
           if (!updatedMetrics.reportUrl || !updatedMetrics.reportUrl.includes('analysis?url=')) {
             updatedMetrics.reportUrl = buildPageSpeedSnapshotUrl(item.pageUrl, targetStrategy);
           }
-          const currentScrUrl = currentMetrics.screenshotUrl || '';
-          const baseScr = currentScrUrl.split('?')[0] || `/api/screenshot/audit-${targetStrategy}`;
-          updatedMetrics.screenshotUrl = `${baseScr}?${reportParams.toString()}`;
+          if (!updatedMetrics.screenshotUrl || updatedMetrics.screenshotUrl.startsWith('/api/screenshot')) {
+            updatedMetrics.screenshotUrl = `https://image.thum.io/get/width/1200/crop/800/${item.pageUrl}`;
+          }
         }
 
         return {

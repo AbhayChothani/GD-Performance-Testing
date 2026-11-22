@@ -189,22 +189,9 @@ export async function runPageSpeedAudit(
     const auditId = `${pageSlug}-${Date.now()}-${strategy}`;
     const uploadedUrl = await saveScreenshot(auditId, cardDataUri, `${pageName} - ${strategy}`);
 
-    const queryParams = new URLSearchParams({
-      url,
-      strategy,
-      p: performance.toString(),
-      a: accessibility.toString(),
-      b: bestPractices.toString(),
-      s: seo.toString(),
-      tbt: totalBlockingTime.toString(),
-      fcp,
-      lcp,
-      cls,
-      si: speedIndex,
-    });
     const screenshotUrl = uploadedUrl && (uploadedUrl.startsWith('http://') || uploadedUrl.startsWith('https://'))
       ? uploadedUrl
-      : `/api/screenshot/${auditId}?${queryParams.toString()}`;
+      : `https://image.thum.io/get/width/1200/crop/800/${url}`;
 
     const reportUrl = buildPageSpeedSnapshotUrl(url, strategy);
 

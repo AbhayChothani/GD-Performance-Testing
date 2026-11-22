@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     } else if (process.env.VERCEL_URL) {
       origin = `https://${process.env.VERCEL_URL}`;
     } else {
-      origin = req.nextUrl?.origin || 'http://localhost:3001';
+      origin = req.nextUrl?.origin || '';
     }
     origin = origin.replace(/\/+$/, '');
 

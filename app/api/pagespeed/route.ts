@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runPlaywrightLiveAudit } from '@/lib/liveAuditor';
 import { runPageSpeedAudit, derivePageName, fetchHtmlTitle, findKnownAudit, buildPageSpeedSnapshotUrl } from '@/lib/pagespeed';
 import { generatePageSpeedCardDataUri } from '@/lib/pageSpeedCardGenerator';
+import { uploadScreenshotToImgBB } from '@/lib/screenshotStore';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // Up to 60s for Vercel Serverless Function execution
@@ -231,6 +232,9 @@ export async function POST(req: NextRequest) {
         speedIndex: '1.8 s',
       });
 
+      const mImgbbUrl = (await uploadScreenshotToImgBB(mCardDataUri, `${known.pageName} - Mobile`)) || known.mobile.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
+      const dImgbbUrl = (await uploadScreenshotToImgBB(dCardDataUri, `${known.pageName} - Desktop`)) || known.desktop.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
+
       return NextResponse.json({
         url: known.pageUrl,
         pageName: known.pageName,
@@ -247,7 +251,7 @@ export async function POST(req: NextRequest) {
             seo: known.mobile.seo,
             totalBlockingTime: known.mobile.totalBlockingTime,
           },
-          screenshotUrl: `/api/screenshot/audit-ref-mobile?${mParams.toString()}`,
+          screenshotUrl: mImgbbUrl,
           screenshotDataUri: mCardDataUri,
           reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'mobile', known.mobile.reportUrl),
           comment: 'Reference audit data (Book.xlsx)',
@@ -263,7 +267,7 @@ export async function POST(req: NextRequest) {
             seo: known.desktop.seo,
             totalBlockingTime: known.desktop.totalBlockingTime,
           },
-          screenshotUrl: `/api/screenshot/audit-ref-desktop?${dParams.toString()}`,
+          screenshotUrl: dImgbbUrl,
           screenshotDataUri: dCardDataUri,
           reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'desktop', known.desktop.reportUrl),
           comment: 'Reference audit data (Book.xlsx)',

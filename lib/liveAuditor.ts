@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { saveScreenshot } from './screenshotStore';
 import { derivePageName, fetchHtmlTitle } from './pagespeed';
-import { buildPageSpeedSnapshotUrl } from './pageSpeedUtils';
+import { buildPageSpeedReportUrl } from './pageSpeedUtils';
 
 export interface LiveAuditOutput {
   success: boolean;
@@ -345,7 +345,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: mScores[2] ?? 0,
         seo: mScores[3] ?? 0,
         totalBlockingTime: mTbt,
-        reportUrl: finalMobileUrl,
+        reportUrl: buildPageSpeedReportUrl(targetUrl, 'mobile'),
         screenshotUrl: mScreenUrl,
         screenshotDataUri: mScreenshotDataUri,
       },
@@ -355,7 +355,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: dScores[2] ?? 0,
         seo: dScores[3] ?? 0,
         totalBlockingTime: dTbt,
-        reportUrl: finalDesktopUrl,
+        reportUrl: buildPageSpeedReportUrl(targetUrl, 'desktop'),
         screenshotUrl: dScreenUrl,
         screenshotDataUri: dScreenshotDataUri,
       },

@@ -9,6 +9,8 @@ interface StoredScreenshot {
   createdAt: number;
 }
 
+export const DEFAULT_IMGBB_API_KEY = '4191a860fcd83c0a4fcc50d49e41caa3';
+
 const SCREENSHOT_DIR = path.join(process.cwd(), 'public', 'screenshots');
 const TMP_SCREENSHOT_DIR = path.join('/tmp', 'screenshots');
 
@@ -82,91 +84,56 @@ export function saveScreenshotLocal(id: string, dataUri: string): string {
 }
 
 /**
- * Uploads screenshot to ImgBB (using IMGBB_API_KEY) or Cloudinary (using CLOUDINARY_URL)
- * and returns the public shareable viewer URL (e.g., https://ibb.co/xyz or https://res.cloudinary.com/...)
+ * Uploads a screenshot buffer/base64 directly to ImgBB using URLSearchParams
+ * and returns the public viewer URL (data.url_viewer e.g., https://ibb.co/xyz).
  */
-export async function uploadToCloud(
-  cleanId: string,
-  dataUri: string,
+export async function uploadScreenshotToImgBB(
+  imageInput: Buffer | string,
   title?: string
 ): Promise<string | null> {
-  const imgbbApiKey = process.env.IMGBB_API_KEY?.trim();
-  const cloudinaryUrl = process.env.CLOUDINARY_URL?.trim();
+  try {
+    const apiKey = (process.env.IMGBB_API_KEY || DEFAULT_IMGBB_API_KEY).trim();
+    if (!apiKey) return null;
 
-  // 1. Try ImgBB if IMGBB_API_KEY is configured
-  if (imgbbApiKey) {
-    try {
-      const rawBase64 = dataUri.replace(/^data:image\/[a-zA-Z+]+;base64,/, '');
-      const formData = new FormData();
-      formData.append('image', rawBase64);
-      formData.append('name', (title || cleanId).replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 32));
-
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.data) {
-          // ImgBB returns url_viewer (e.g. https://ibb.co/2ndCYJK) which opens the clean webpage just like prnt.sc
-          const viewerUrl = json.data.url_viewer || json.data.url || json.data.display_url;
-          console.log(`[ImgBB] Successfully uploaded screenshot to public cloud: ${viewerUrl}`);
-          return viewerUrl;
-        }
-      } else {
-        const errText = await res.text();
-        console.warn('[ImgBB] Upload API returned status', res.status, errText);
-      }
-    } catch (imgbbErr) {
-      console.warn('[ImgBB] Upload error:', imgbbErr);
+    let base64String = '';
+    if (Buffer.isBuffer(imageInput)) {
+      base64String = imageInput.toString('base64');
+    } else if (typeof imageInput === 'string') {
+      base64String = imageInput.replace(/^data:image\/[a-zA-Z+]+;base64,/, '').trim();
     }
-  }
 
-  // 2. Try Cloudinary if CLOUDINARY_URL is configured
-  if (cloudinaryUrl) {
-    try {
-      const match = cloudinaryUrl.match(/cloudinary:\/\/([^:]+):([^@]+)@([^/]+)/);
-      if (match) {
-        const [, apiKey, apiSecret, cloudName] = match;
-        const timestamp = Math.floor(Date.now() / 1000).toString();
-        const crypto = await import('crypto');
-        const signature = crypto
-          .createHash('sha1')
-          .update(`timestamp=${timestamp}${apiSecret}`)
-          .digest('hex');
+    if (!base64String) return null;
 
-        const formData = new FormData();
-        formData.append('file', dataUri);
-        formData.append('api_key', apiKey);
-        formData.append('timestamp', timestamp);
-        formData.append('signature', signature);
-
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (res.ok) {
-          const json = await res.json();
-          if (json.secure_url) {
-            console.log(`[Cloudinary] Successfully uploaded screenshot: ${json.secure_url}`);
-            return json.secure_url;
-          }
-        }
-      }
-    } catch (cloudErr) {
-      console.warn('[Cloudinary] Upload error:', cloudErr);
+    const params = new URLSearchParams();
+    params.append('image', base64String);
+    if (title) {
+      params.append('name', title.replace(/[^a-zA-Z0-9_-]+/g, '-').slice(0, 32));
     }
-  }
 
+    const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: 'POST',
+      body: params,
+    });
+
+    const imgbbData = await imgbbRes.json();
+    const screenshotUrl = imgbbData?.data?.url_viewer || imgbbData?.data?.url;
+
+    if (screenshotUrl) {
+      console.log(`[ImgBB] Successfully uploaded screenshot to cloud: ${screenshotUrl}`);
+      return screenshotUrl;
+    } else {
+      console.warn('[ImgBB] Upload response did not contain URL:', imgbbData);
+    }
+  } catch (err) {
+    console.error('[ImgBB] Upload exception:', err);
+  }
   return null;
 }
 
 /**
  * Main screenshot persistence function:
- * 1. Always saves locally in memory & disk as fallback
- * 2. Uploads to ImgBB / Cloudinary if configured and returns public viewer URL
+ * 1. Uploads directly to ImgBB cloud and returns https://ibb.co/...
+ * 2. Caches locally in memory/disk as fallback
  */
 export async function saveScreenshot(
   id: string,
@@ -174,10 +141,12 @@ export async function saveScreenshot(
   title?: string
 ): Promise<string> {
   const cleanId = id.replace(/\.(jpg|jpeg|png|svg)$/i, '');
+
+  // Always cache locally as instant fallback
   const localUrl = saveScreenshotLocal(cleanId, dataUri);
 
-  // Attempt cloud upload
-  const cloudUrl = await uploadToCloud(cleanId, dataUri, title);
+  // Upload to ImgBB cloud using URLSearchParams
+  const cloudUrl = await uploadScreenshotToImgBB(dataUri, title);
   if (cloudUrl) {
     return cloudUrl;
   }
