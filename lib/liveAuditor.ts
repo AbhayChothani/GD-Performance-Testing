@@ -62,13 +62,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
   if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const chromium = (await import('@sparticuz/chromium')).default;
     executablePath = await chromium.executablePath();
-    launchArgs = [
-      ...chromium.args,
-      '--disable-blink-features=AutomationControlled',
-      '--disable-dev-shm-usage',
-      '--no-sandbox',
-    ];
-    isHeadless = true;
+    launchArgs = chromium.args;
+    isHeadless = (chromium as unknown as { headless?: boolean | 'shell' }).headless ?? true;
   } else {
     executablePath = getBrowserExecutablePath();
     if (!fs.existsSync(executablePath)) {
@@ -130,7 +125,16 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       }
     });
 
-    // 3. Wait for Google analysis to complete and redirect to permanent snapshot URL (/analysis/<slug>/<report-id>)
+    // 3. Wait for Google analysis to complete and redirect to snapshot URL (/analysis/<slug>/<report-id>)
+    try {
+      await page.waitForFunction(
+        () => window.location.pathname.split('/').length >= 4 && !window.location.search.includes('url='),
+        { timeout: 45000 }
+      );
+    } catch {
+      // If pathname hasn't redirected yet, loop below continues polling
+    }
+
     let finalMobileUrl = '';
     let mScores: number[] = [];
 
@@ -256,8 +260,17 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       }
     });
 
-    // Wait 2.5 seconds for desktop scores to render
-    await new Promise((r) => setTimeout(r, 2500));
+    // Wait for desktop tab and URL update
+    try {
+      await page.waitForFunction(
+        () => window.location.search.includes('form_factor=desktop'),
+        { timeout: 15000 }
+      );
+    } catch {
+      // Continue to score scrape
+    }
+
+    await new Promise((r) => setTimeout(r, 2000));
 
     let finalDesktopUrl = page.url();
     if (!finalDesktopUrl.includes('form_factor=desktop') || finalDesktopUrl.includes('?url=')) {

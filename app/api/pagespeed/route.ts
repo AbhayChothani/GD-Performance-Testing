@@ -129,6 +129,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
+            liveAuditError: lastApiError,
             mobile: {
               ...mRes,
               reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
@@ -147,6 +148,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: mRes.pageName || derivePageName(parsedUrl),
+            liveAuditError: lastApiError,
             mobile: {
               ...mRes,
               reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
@@ -165,6 +167,7 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: dRes.pageName || derivePageName(parsedUrl),
+            liveAuditError: lastApiError,
             mobile: {
               ...dRes,
               strategy: 'mobile',

@@ -63,7 +63,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
   };
 
   const getScoreCellStyle = (score: number | null | undefined, isLoading?: boolean) => {
-    if (isLoading || score === null || score === undefined || typeof score !== 'number') {
+    if (isLoading || score === null || score === undefined || typeof score !== 'number' || isNaN(score)) {
       return 'bg-slate-50 text-slate-400 font-medium';
     }
     if (score >= 90) {
@@ -119,7 +119,12 @@ export const ReportTable: React.FC<ReportTableProps> = ({
             {items.map((item, idx) => {
               const isNameEditing = editingNameId === item.id;
               const hasError = item.status === 'error';
-              const isItemRunning = item.status === 'running';
+              const isItemRunning =
+                item.status === 'running' ||
+                item.mobile.status === 'running' ||
+                item.desktop.status === 'running';
+              const isMobileRunning = isItemRunning || item.mobile.status === 'running';
+              const isDesktopRunning = isItemRunning || item.desktop.status === 'running';
 
               return (
                 <React.Fragment key={item.id || idx}>
@@ -206,50 +211,50 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.mobile.performance,
-                        isItemRunning
+                        isMobileRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.mobile.performance !== null ? item.mobile.performance : '-')}
+                      {isMobileRunning ? '...' : (item.mobile.performance !== null ? item.mobile.performance : '-')}
                     </td>
 
                     {/* 6. Accessibility */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.mobile.accessibility,
-                        isItemRunning
+                        isMobileRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.mobile.accessibility !== null ? item.mobile.accessibility : '-')}
+                      {isMobileRunning ? '...' : (item.mobile.accessibility !== null ? item.mobile.accessibility : '-')}
                     </td>
 
                     {/* 7. Best Practices */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.mobile.bestPractices,
-                        isItemRunning
+                        isMobileRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.mobile.bestPractices !== null ? item.mobile.bestPractices : '-')}
+                      {isMobileRunning ? '...' : (item.mobile.bestPractices !== null ? item.mobile.bestPractices : '-')}
                     </td>
 
                     {/* 8. SEO */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.mobile.seo,
-                        isItemRunning
+                        isMobileRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.mobile.seo !== null ? item.mobile.seo : '-')}
+                      {isMobileRunning ? '...' : (item.mobile.seo !== null ? item.mobile.seo : '-')}
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
                     <td className="border border-black px-3 py-2 text-right font-mono font-semibold text-slate-800 align-middle select-none">
-                      {isItemRunning ? '...' : (item.mobile.totalBlockingTime !== null ? item.mobile.totalBlockingTime : '-')}
+                      {isMobileRunning ? '...' : (item.mobile.totalBlockingTime !== null ? item.mobile.totalBlockingTime : '-')}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
-                      {isItemRunning ? (
+                      {isMobileRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.mobile.screenshotUrl ? (
                         <div className="flex items-center gap-1.5">
@@ -282,7 +287,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {isItemRunning ? (
+                      {isMobileRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.mobile.reportUrl ? (
                         <a
@@ -349,50 +354,50 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.desktop.performance,
-                        isItemRunning
+                        isDesktopRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.desktop.performance !== null ? item.desktop.performance : '-')}
+                      {isDesktopRunning ? '...' : (item.desktop.performance !== null ? item.desktop.performance : '-')}
                     </td>
 
                     {/* 6. Accessibility */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.desktop.accessibility,
-                        isItemRunning
+                        isDesktopRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.desktop.accessibility !== null ? item.desktop.accessibility : '-')}
+                      {isDesktopRunning ? '...' : (item.desktop.accessibility !== null ? item.desktop.accessibility : '-')}
                     </td>
 
                     {/* 7. Best Practices */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.desktop.bestPractices,
-                        isItemRunning
+                        isDesktopRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.desktop.bestPractices !== null ? item.desktop.bestPractices : '-')}
+                      {isDesktopRunning ? '...' : (item.desktop.bestPractices !== null ? item.desktop.bestPractices : '-')}
                     </td>
 
                     {/* 8. SEO */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
                         item.desktop.seo,
-                        isItemRunning
+                        isDesktopRunning
                       )}`}
                     >
-                      {isItemRunning ? '...' : (item.desktop.seo !== null ? item.desktop.seo : '-')}
+                      {isDesktopRunning ? '...' : (item.desktop.seo !== null ? item.desktop.seo : '-')}
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
                     <td className="border border-black px-3 py-2 text-right font-mono font-semibold text-slate-800 align-middle select-none">
-                      {isItemRunning ? '...' : (item.desktop.totalBlockingTime !== null ? item.desktop.totalBlockingTime : '-')}
+                      {isDesktopRunning ? '...' : (item.desktop.totalBlockingTime !== null ? item.desktop.totalBlockingTime : '-')}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
-                      {isItemRunning ? (
+                      {isDesktopRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.desktop.screenshotUrl ? (
                         <div className="flex items-center gap-1.5">
@@ -425,7 +430,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {isItemRunning ? (
+                      {isDesktopRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.desktop.reportUrl ? (
                         <a
