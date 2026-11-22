@@ -55,20 +55,38 @@ function getBrowserExecutablePath(): string {
 }
 
 export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAuditOutput> {
-  const chromePath = getBrowserExecutablePath();
-  if (!fs.existsSync(chromePath)) {
-    throw new Error(`Chrome / Edge executable not found at ${chromePath}`);
-  }
+  let executablePath: string;
+  let launchArgs: string[];
+  let isHeadless: boolean | 'shell' = true;
 
-  const browser = await puppeteer.launch({
-    executablePath: chromePath,
-    headless: true,
-    args: [
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const chromium = (await import('@sparticuz/chromium')).default;
+    executablePath = await chromium.executablePath();
+    launchArgs = [
+      ...chromium.args,
+      '--disable-blink-features=AutomationControlled',
+      '--disable-dev-shm-usage',
+      '--no-sandbox',
+    ];
+    isHeadless = true;
+  } else {
+    executablePath = getBrowserExecutablePath();
+    if (!fs.existsSync(executablePath)) {
+      throw new Error(`Chrome / Edge executable not found at ${executablePath}`);
+    }
+    launchArgs = [
       '--no-sandbox',
       '--disable-dev-shm-usage',
       '--disable-blink-features=AutomationControlled',
       '--disable-gpu',
-    ],
+    ];
+    isHeadless = true;
+  }
+
+  const browser = await puppeteer.launch({
+    executablePath,
+    headless: isHeadless,
+    args: launchArgs,
   });
 
   try {
@@ -88,7 +106,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     }
 
     // 1. Open Google PageSpeed Insights homepage
-    await page.goto('https://pagespeed.web.dev/', { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.goto('https://pagespeed.web.dev/', { waitUntil: 'domcontentloaded', timeout: 35000 });
 
     // Dismiss cookie consent banner if present
     await page.evaluate(() => {
@@ -100,7 +118,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     // 2. Enter target URL into search box and click "Analyze"
     const inputSelector = 'input[type="url"], input[type="text"], input[name="url"], input';
     await page.waitForSelector(inputSelector, { timeout: 15000 });
-    await page.type(inputSelector, targetUrl, { delay: 20 });
+    await page.type(inputSelector, targetUrl, { delay: 10 });
 
     await page.evaluate(() => {
       const btns = Array.from(document.querySelectorAll('button'));
@@ -116,8 +134,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     let finalMobileUrl = '';
     let mScores: number[] = [];
 
-    for (let i = 0; i < 45; i++) {
-      await new Promise((r) => setTimeout(r, 2000));
+    for (let i = 0; i < 32; i++) {
+      await new Promise((r) => setTimeout(r, 1500));
       const currentUrl = page.url();
 
       // Ensure currentUrl has redirected away from ?url= to static snapshot URL format: /analysis/<slug>/<report-id>
