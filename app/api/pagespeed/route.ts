@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { runPlaywrightLiveAudit } from '@/lib/liveAuditor';
 import { runPageSpeedAudit, derivePageName, findKnownAudit } from '@/lib/pagespeed';
 import { generatePageSpeedCardDataUri } from '@/lib/pageSpeedCardGenerator';
 import { uploadScreenshotToImgBB } from '@/lib/screenshotStore';
@@ -59,15 +60,72 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+    // 1. ON LOCALHOST (!process.env.VERCEL):
+    // Use local Chrome/Puppeteer to open pagespeed.web.dev, run analysis,
+    // and capture the permanent static snapshot URL: https://pagespeed.web.dev/analysis/<slug>/<report-id>?form_factor=mobile
+    if (!isVercel) {
+      try {
+        console.log(`[Localhost] Starting local Puppeteer live audit for ${parsedUrl}...`);
+        const liveResult = await runPlaywrightLiveAudit(parsedUrl);
+        if (liveResult.success && liveResult.mobile.detailReportUrl) {
+          console.log(`[Localhost] Successfully captured static snapshot URL: ${liveResult.mobile.detailReportUrl}`);
+          return NextResponse.json({
+            url: parsedUrl,
+            pageName: liveResult.pageName || derivePageName(parsedUrl),
+            mobile: {
+              url: parsedUrl,
+              strategy: 'mobile',
+              pageName: liveResult.pageName,
+              metrics: {
+                performance: liveResult.mobile.performance,
+                accessibility: liveResult.mobile.accessibility,
+                bestPractices: liveResult.mobile.bestPractices,
+                seo: liveResult.mobile.seo,
+                totalBlockingTime: liveResult.mobile.totalBlockingTime,
+              },
+              screenshotUrl: liveResult.mobile.screenshotUrl,
+              screenshotDataUri: liveResult.mobile.screenshotDataUri,
+              reportUrl: liveResult.mobile.detailReportUrl,
+              detailReportUrl: liveResult.mobile.detailReportUrl,
+            },
+            desktop: {
+              url: parsedUrl,
+              strategy: 'desktop',
+              pageName: liveResult.pageName,
+              metrics: {
+                performance: liveResult.desktop.performance,
+                accessibility: liveResult.desktop.accessibility,
+                bestPractices: liveResult.desktop.bestPractices,
+                seo: liveResult.desktop.seo,
+                totalBlockingTime: liveResult.desktop.totalBlockingTime,
+              },
+              screenshotUrl: liveResult.desktop.screenshotUrl,
+              screenshotDataUri: liveResult.desktop.screenshotDataUri,
+              reportUrl: liveResult.desktop.detailReportUrl,
+              detailReportUrl: liveResult.desktop.detailReportUrl,
+            },
+          });
+        }
+      } catch (localPuppeteerErr) {
+        console.warn(
+          '[Localhost] Puppeteer live audit failed, falling back to official Google PageSpeed API:',
+          localPuppeteerErr
+        );
+      }
+    }
+
+    // 2. ON VERCEL (OR FALLBACK):
+    // Use official Google PageSpeed Insights REST API (Fast & Never times out on cloud IPs)
     const effectiveApiKey = (
       apiKey ||
       process.env.PAGESPEED_API_KEY ||
       'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI'
     ).trim();
 
-    console.log(`Starting official Google PageSpeed REST API audit for ${parsedUrl}...`);
+    console.log(`[Vercel/API] Starting official Google PageSpeed REST API audit for ${parsedUrl}...`);
 
-    // 1. Fetch official Google PageSpeed Insights REST API for Mobile and Desktop in parallel
     const [mRes, dRes] = await Promise.all([
       runPageSpeedAudit(parsedUrl, 'mobile', effectiveApiKey),
       runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey),
@@ -83,13 +141,13 @@ export async function POST(req: NextRequest) {
         pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
         mobile: {
           ...mRes,
-          reportUrl: mRes.detailReportUrl || mDirectUrl,
-          detailReportUrl: mRes.detailReportUrl || mDirectUrl,
+          reportUrl: mDirectUrl,
+          detailReportUrl: mDirectUrl,
         },
         desktop: {
           ...dRes,
-          reportUrl: dRes.detailReportUrl || dDirectUrl,
-          detailReportUrl: dRes.detailReportUrl || dDirectUrl,
+          reportUrl: dDirectUrl,
+          detailReportUrl: dDirectUrl,
         },
       });
     }
@@ -101,8 +159,8 @@ export async function POST(req: NextRequest) {
         pageName: mRes.pageName || derivePageName(parsedUrl),
         mobile: {
           ...mRes,
-          reportUrl: mRes.detailReportUrl || mDirectUrl,
-          detailReportUrl: mRes.detailReportUrl || mDirectUrl,
+          reportUrl: mDirectUrl,
+          detailReportUrl: mDirectUrl,
         },
         desktop: {
           ...mRes,
@@ -126,8 +184,8 @@ export async function POST(req: NextRequest) {
         },
         desktop: {
           ...dRes,
-          reportUrl: dRes.detailReportUrl || dDirectUrl,
-          detailReportUrl: dRes.detailReportUrl || dDirectUrl,
+          reportUrl: dDirectUrl,
+          detailReportUrl: dDirectUrl,
         },
       });
     }
@@ -173,9 +231,6 @@ export async function POST(req: NextRequest) {
         known.desktop.screenshotUrl ||
         `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
 
-      const mStaticReportUrl = `/report?url=${encodeURIComponent(known.pageUrl)}&strategy=mobile&name=${encodeURIComponent(known.pageName)}&p=${known.mobile.performance || 85}&a=${known.mobile.accessibility || 98}&b=${known.mobile.bestPractices || 96}&s=${known.mobile.seo || 100}&tbt=${encodeURIComponent(`${known.mobile.totalBlockingTime || 180} ms`)}`;
-      const dStaticReportUrl = `/report?url=${encodeURIComponent(known.pageUrl)}&strategy=desktop&name=${encodeURIComponent(known.pageName)}&p=${known.desktop.performance || 95}&a=${known.desktop.accessibility || 98}&b=${known.desktop.bestPractices || 96}&s=${known.desktop.seo || 100}&tbt=${encodeURIComponent(`${known.desktop.totalBlockingTime || 50} ms`)}`;
-
       return NextResponse.json({
         url: known.pageUrl,
         pageName: known.pageName,
@@ -194,8 +249,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: mImgbbUrl,
           screenshotDataUri: mCardDataUri,
-          reportUrl: mStaticReportUrl,
-          detailReportUrl: mStaticReportUrl,
+          reportUrl: mDirectUrl,
+          detailReportUrl: mDirectUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -211,8 +266,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: dImgbbUrl,
           screenshotDataUri: dCardDataUri,
-          reportUrl: dStaticReportUrl,
-          detailReportUrl: dStaticReportUrl,
+          reportUrl: dDirectUrl,
+          detailReportUrl: dDirectUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
       });

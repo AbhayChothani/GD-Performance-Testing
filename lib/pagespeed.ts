@@ -216,25 +216,7 @@ export async function runPageSpeedAudit(
         ? `${uploadedUrl}?${queryParams.toString()}`
         : fallbackLocalEndpoint;
 
-    // Build the static snapshot report URL with all exact metrics locked (never forces Google to re-run with different scores)
-    const staticReportQuery = new URLSearchParams({
-      url,
-      strategy: strategy.toLowerCase(),
-      name: pageName,
-      p: String(performance),
-      a: String(accessibility),
-      b: String(bestPractices),
-      s: String(seo),
-      tbt: tbtDisplay,
-      fcp,
-      lcp,
-      cls,
-      si: speedIndex,
-    });
-    if (screenshotUrl && !screenshotUrl.startsWith('data:')) {
-      staticReportQuery.set('img', screenshotUrl);
-    }
-    const staticReportUrl = `/report?${staticReportQuery.toString()}`;
+    const pageSpeedReportUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=${strategy.toLowerCase()}`;
 
     return {
       url,
@@ -249,8 +231,8 @@ export async function runPageSpeedAudit(
       },
       screenshotDataUri: cardDataUri,
       screenshotUrl,
-      reportUrl: staticReportUrl,
-      detailReportUrl: staticReportUrl,
+      reportUrl: pageSpeedReportUrl,
+      detailReportUrl: pageSpeedReportUrl,
     };
   } catch (err: unknown) {
     const errMessage = err instanceof Error ? err.message : 'Unknown error during PageSpeed audit';

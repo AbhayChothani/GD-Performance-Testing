@@ -35,36 +35,12 @@ export default function HomePage() {
 
   // Load the pre-audited demo report from Book.xlsx
   const handleLoadDemoReport = () => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const mappedDemo = DEMO_ITEMS.map((item) => {
-      const mUrl = toAbsoluteUrl(
-        `/report?url=${encodeURIComponent(item.pageUrl)}&strategy=mobile&name=${encodeURIComponent(item.pageName)}&p=${item.mobile.performance || 85}&a=${item.mobile.accessibility || 98}&b=${item.mobile.bestPractices || 96}&s=${item.mobile.seo || 100}&tbt=${item.mobile.totalBlockingTime || 180}%20ms`,
-        origin
-      );
-      const dUrl = toAbsoluteUrl(
-        `/report?url=${encodeURIComponent(item.pageUrl)}&strategy=desktop&name=${encodeURIComponent(item.pageName)}&p=${item.desktop.performance || 95}&a=${item.desktop.accessibility || 98}&b=${item.desktop.bestPractices || 96}&s=${item.desktop.seo || 100}&tbt=${item.desktop.totalBlockingTime || 50}%20ms`,
-        origin
-      );
-      return {
-        ...item,
-        mobile: {
-          ...item.mobile,
-          reportUrl: mUrl,
-          detailReportUrl: mUrl,
-        },
-        desktop: {
-          ...item.desktop,
-          reportUrl: dUrl,
-          detailReportUrl: dUrl,
-        },
-      };
-    });
-    setItems(mappedDemo);
+    setItems(DEMO_ITEMS);
     setMetadata(DEFAULT_METADATA);
     setProgress({
-      total: mappedDemo.length,
-      completed: mappedDemo.length,
-      current: mappedDemo.length,
+      total: DEMO_ITEMS.length,
+      completed: DEMO_ITEMS.length,
+      current: DEMO_ITEMS.length,
       currentUrl: '',
       currentStrategy: '',
       percentage: 100,
@@ -249,11 +225,9 @@ export default function HomePage() {
                 screenshotUrl: data.mobile?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.mobile?.screenshotDataUri,
                 reportUrl:
-                  toAbsoluteUrl(
-                    data.mobile?.detailReportUrl ||
-                      data.mobile?.reportUrl ||
-                      `/report?url=${encodeURIComponent(currentUrl)}&strategy=mobile&name=${encodeURIComponent(data.pageName || 'Home page')}&p=${mMetrics.performance ?? 0}&a=${mMetrics.accessibility ?? 0}&b=${mMetrics.bestPractices ?? 0}&s=${mMetrics.seo ?? 0}&tbt=${mMetrics.totalBlockingTime ?? 0}%20ms`
-                  ),
+                  data.mobile?.detailReportUrl ||
+                  data.mobile?.reportUrl ||
+                  `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=mobile`,
                 comment: '',
                 status: 'completed',
               },
@@ -267,11 +241,9 @@ export default function HomePage() {
                 screenshotUrl: data.desktop?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.desktop?.screenshotDataUri,
                 reportUrl:
-                  toAbsoluteUrl(
-                    data.desktop?.detailReportUrl ||
-                      data.desktop?.reportUrl ||
-                      `/report?url=${encodeURIComponent(currentUrl)}&strategy=desktop&name=${encodeURIComponent(data.pageName || 'Home page')}&p=${dMetrics.performance ?? 0}&a=${dMetrics.accessibility ?? 0}&b=${dMetrics.bestPractices ?? 0}&s=${dMetrics.seo ?? 0}&tbt=${dMetrics.totalBlockingTime ?? 0}%20ms`
-                  ),
+                  data.desktop?.detailReportUrl ||
+                  data.desktop?.reportUrl ||
+                  `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=desktop`,
                 comment: '',
                 status: 'completed',
               },
@@ -371,11 +343,9 @@ export default function HomePage() {
               screenshotUrl: data.mobile?.screenshotUrl || null,
               screenshotDataUri: data.mobile?.screenshotDataUri || null,
               reportUrl:
-                toAbsoluteUrl(
-                  data.mobile?.detailReportUrl ||
-                    data.mobile?.reportUrl ||
-                    item.mobile.reportUrl
-                ),
+                data.mobile?.detailReportUrl ||
+                data.mobile?.reportUrl ||
+                item.mobile.reportUrl,
               status: 'completed',
             },
             desktop: {
@@ -388,11 +358,9 @@ export default function HomePage() {
               screenshotUrl: data.desktop?.screenshotUrl || null,
               screenshotDataUri: data.desktop?.screenshotDataUri || null,
               reportUrl:
-                toAbsoluteUrl(
-                  data.desktop?.detailReportUrl ||
-                    data.desktop?.reportUrl ||
-                    item.desktop.reportUrl
-                ),
+                data.desktop?.detailReportUrl ||
+                data.desktop?.reportUrl ||
+                item.desktop.reportUrl,
               status: 'completed',
             },
           };
