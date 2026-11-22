@@ -42,6 +42,9 @@ function getBrowserExecutablePath(): string {
     path.join(process.env.LOCALAPPDATA || '', 'Google\\Chrome\\Application\\chrome.exe'),
     'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
     'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium',
   ];
   for (const c of candidates) {
     if (c && fs.existsSync(c)) return c;
@@ -82,45 +85,67 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       pageName = derivePageName(targetUrl);
     }
 
-    const encoded = encodeURIComponent(targetUrl);
-    const initUrl = `https://pagespeed.web.dev/analysis?url=${encoded}&form_factor=mobile`;
+    // 1. Open Google PageSpeed Insights homepage
+    await page.goto('https://pagespeed.web.dev/', { waitUntil: 'networkidle2', timeout: 60000 });
 
-    await page.goto(initUrl, { waitUntil: 'domcontentloaded', timeout: 60000 });
-
-    // 1. Wait for mobile gauges (up to 55 iterations x 1.5s = ~82s)
-    let mScores: number[] = [];
-    for (let i = 0; i < 55; i++) {
-      await new Promise((r) => setTimeout(r, 1500));
-      mScores = await page.evaluate(() => {
-        const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
-        const visible = gauges.filter((g) => {
-          const r = g.getBoundingClientRect();
-          const text = (g.textContent || '').trim();
-          return (
-            r.width > 0 &&
-            r.height > 0 &&
-            window.getComputedStyle(g).display !== 'none' &&
-            text.length > 0
-          );
-        });
-        return visible.slice(0, 4).map((g) => parseInt((g.textContent || '').trim(), 10) || 0);
-      });
-      if (mScores.length >= 4) break;
-    }
-
-    if (mScores.length < 4) {
-      throw new Error('Mobile audit timed out waiting for Google PageSpeed gauges');
-    }
-
-    const analyzedMobileUrl = page.url();
-
-    // Dismiss cookie banner cleanly
+    // Dismiss cookie consent banner if present
     await page.evaluate(() => {
       const btns = Array.from(document.querySelectorAll('button'));
       const okBtn = btns.find((b) => b.textContent && b.textContent.toLowerCase().includes('got it'));
       if (okBtn) (okBtn as HTMLElement).click();
     });
-    await new Promise((r) => setTimeout(r, 500));
+
+    // 2. Enter target URL into search box and click "Analyze"
+    const inputSelector = 'input[type="url"], input[type="text"], input[name="url"], input';
+    await page.waitForSelector(inputSelector, { timeout: 15000 });
+    await page.type(inputSelector, targetUrl, { delay: 20 });
+
+    await page.evaluate(() => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const analyzeBtn = btns.find(
+        (b) => b.textContent && b.textContent.trim().toLowerCase().includes('analyze')
+      );
+      if (analyzeBtn) {
+        analyzeBtn.click();
+      }
+    });
+
+    // 3. Wait for Google analysis to complete and redirect to permanent snapshot URL (/analysis/<slug>/<report-id>)
+    let finalMobileUrl = '';
+    let mScores: number[] = [];
+
+    for (let i = 0; i < 45; i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+      const currentUrl = page.url();
+
+      if (currentUrl.includes('/analysis/')) {
+        mScores = await page.evaluate(() => {
+          const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
+          const visible = gauges.filter((g) => {
+            const r = g.getBoundingClientRect();
+            const text = (g.textContent || '').trim();
+            return (
+              r.width > 0 &&
+              r.height > 0 &&
+              window.getComputedStyle(g).display !== 'none' &&
+              text.length > 0
+            );
+          });
+          return visible.slice(0, 4).map((g) => parseInt((g.textContent || '').trim(), 10) || 0);
+        });
+
+        if (mScores.length >= 4) {
+          finalMobileUrl = currentUrl.includes('form_factor=mobile')
+            ? currentUrl
+            : `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}form_factor=mobile`;
+          break;
+        }
+      }
+    }
+
+    if (mScores.length < 4 || !finalMobileUrl) {
+      throw new Error('Mobile audit timed out waiting for Google PageSpeed analysis and snapshot URL');
+    }
 
     // Extract Mobile TBT
     const mTbt = await page.evaluate(() => {
@@ -143,7 +168,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       return 0;
     });
 
-    // 2. Extract Mobile PageSpeed Card Screenshot (matching image.png)
+    // Extract Mobile PageSpeed Card Screenshot
     let mScreenshotDataUri: string | undefined;
     try {
       const mClip = await page.evaluate(() => {
@@ -186,7 +211,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       console.warn('Mobile card screenshot capture warning:', mErr);
     }
 
-    // 3. Switch to Desktop tab in-page
+    // 4. Switch to Desktop tab in-page
     await page.evaluate(() => {
       const tabs = Array.from(document.querySelectorAll('[role="tab"], button, span'));
       const desktopTab = tabs.find(
@@ -204,7 +229,12 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     // Wait 2.5 seconds for desktop scores to render
     await new Promise((r) => setTimeout(r, 2500));
 
-    // 4. Extract Desktop scores
+    let finalDesktopUrl = page.url();
+    if (!finalDesktopUrl.includes('form_factor=desktop')) {
+      finalDesktopUrl = finalMobileUrl.replace('form_factor=mobile', 'form_factor=desktop');
+    }
+
+    // Extract Desktop scores
     let dScores: number[] = [];
     for (let i = 0; i < 20; i++) {
       dScores = await page.evaluate(() => {
@@ -250,7 +280,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       return 0;
     });
 
-    // 5. Extract Desktop PageSpeed Card Screenshot (matching image.png)
+    // Extract Desktop PageSpeed Card Screenshot
     let dScreenshotDataUri: string | undefined;
     try {
       const dClip = await page.evaluate(() => {
@@ -293,8 +323,6 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       console.warn('Desktop card screenshot capture warning:', dErr);
     }
 
-    const analyzedDesktopUrl = buildPageSpeedSnapshotUrl(targetUrl, 'desktop', analyzedMobileUrl);
-    const finalMobileUrl = buildPageSpeedSnapshotUrl(targetUrl, 'mobile', analyzedMobileUrl);
     const pageSlug = (pageName || 'page')
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -327,7 +355,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: dScores[2] ?? 0,
         seo: dScores[3] ?? 0,
         totalBlockingTime: dTbt,
-        reportUrl: analyzedDesktopUrl,
+        reportUrl: finalDesktopUrl,
         screenshotUrl: dScreenUrl,
         screenshotDataUri: dScreenshotDataUri,
       },

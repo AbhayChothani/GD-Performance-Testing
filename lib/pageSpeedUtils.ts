@@ -16,11 +16,24 @@ export function buildPageSpeedReportUrl(
 export function buildPageSpeedSnapshotUrl(
   targetUrl: string,
   strategy: 'mobile' | 'desktop',
-  _existingReportUrl?: string
+  existingReportUrl?: string
 ): string {
-  // Use Google's official query-parameter format:
-  // https://pagespeed.web.dev/analysis?url=<encodedUrl>&form_factor=<mobile|desktop>
-  // This automatically fills the URL and device strategy, runs the analysis live,
-  // and completely eliminates the "A report does not exist for the ID <id>" error.
+  // If an exact static snapshot URL was captured by Puppeteer (/analysis/<slug>/<report-id>),
+  // preserve it and ensure form_factor matches the target strategy!
+  if (existingReportUrl && existingReportUrl.includes('pagespeed.web.dev/analysis/')) {
+    const match = existingReportUrl.match(/pagespeed\.web\.dev\/analysis\/([^/?#]+)\/([^/?#]+)/i);
+    if (match) {
+      const slug = match[1];
+      const id = match[2];
+      return `https://pagespeed.web.dev/analysis/${slug}/${id}?form_factor=${strategy.toLowerCase()}`;
+    }
+    return existingReportUrl;
+  }
+
+  if (existingReportUrl && existingReportUrl.startsWith('https://pagespeed.web.dev/')) {
+    return existingReportUrl;
+  }
+
+  // Fallback if no static snapshot URL has been captured yet
   return buildPageSpeedReportUrl(targetUrl, strategy);
 }

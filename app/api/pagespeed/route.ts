@@ -59,10 +59,59 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
     let lastApiError: string | null = null;
 
-    // 1. If an API key is provided (or set in PAGESPEED_API_KEY env / default), run the official Google Cloud PageSpeed API in parallel
+    // 1. PRIMARY AUDIT METHOD: Headless Browser Live Audit on https://pagespeed.web.dev/
+    // Opens https://pagespeed.web.dev/, enters target URL, clicks Analyze,
+    // captures the exact permanent snapshot URL (/analysis/<slug>/<report-id>?form_factor=mobile)
+    // and scrapes the exact matching scores directly from the completed report page.
+    try {
+      console.log(`Starting headless PageSpeed live audit for ${parsedUrl}...`);
+      const liveResult = await runPlaywrightLiveAudit(parsedUrl);
+      if (liveResult.success) {
+        return NextResponse.json({
+          url: parsedUrl,
+          pageName: liveResult.pageName || derivePageName(parsedUrl),
+          mobile: {
+            url: parsedUrl,
+            strategy: 'mobile',
+            pageName: liveResult.pageName,
+            metrics: {
+              performance: liveResult.mobile.performance,
+              accessibility: liveResult.mobile.accessibility,
+              bestPractices: liveResult.mobile.bestPractices,
+              seo: liveResult.mobile.seo,
+              totalBlockingTime: liveResult.mobile.totalBlockingTime,
+            },
+            screenshotUrl: liveResult.mobile.screenshotUrl,
+            screenshotDataUri: liveResult.mobile.screenshotDataUri,
+            reportUrl: liveResult.mobile.reportUrl,
+          },
+          desktop: {
+            url: parsedUrl,
+            strategy: 'desktop',
+            pageName: liveResult.pageName,
+            metrics: {
+              performance: liveResult.desktop.performance,
+              accessibility: liveResult.desktop.accessibility,
+              bestPractices: liveResult.desktop.bestPractices,
+              seo: liveResult.desktop.seo,
+              totalBlockingTime: liveResult.desktop.totalBlockingTime,
+            },
+            screenshotUrl: liveResult.desktop.screenshotUrl,
+            screenshotDataUri: liveResult.desktop.screenshotDataUri,
+            reportUrl: liveResult.desktop.reportUrl,
+          },
+        });
+      }
+    } catch (liveErr) {
+      console.warn('Headless browser audit failed, falling back:', liveErr);
+      lastApiError = liveErr instanceof Error ? liveErr.message : 'Headless audit error';
+    }
+
+    // 2. Secondary Fallback: If an API key is provided, run official Google Cloud PageSpeed API
+    const effectiveApiKey = (apiKey || process.env.PAGESPEED_API_KEY || 'AIzaSyBLTDMDGSd0VPS0T3UApY-mdLXpcwL-9LI').trim();
+
     if (effectiveApiKey) {
       try {
         const [mRes, dRes] = await Promise.all([
@@ -103,52 +152,6 @@ export async function POST(req: NextRequest) {
       } catch (apiErr) {
         lastApiError = apiErr instanceof Error ? apiErr.message : 'Google API request failed';
         console.warn('Google Cloud API Key exception:', apiErr);
-      }
-    }
-
-    // 2. If running locally (not in a serverless environment like Vercel), run headless Chrome / Puppeteer
-    const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
-    if (!isVercel) {
-      try {
-        const liveResult = await runPlaywrightLiveAudit(parsedUrl);
-        if (liveResult.success) {
-          return NextResponse.json({
-            url: parsedUrl,
-            pageName: liveResult.pageName || derivePageName(parsedUrl),
-            mobile: {
-              url: parsedUrl,
-              strategy: 'mobile',
-              pageName: liveResult.pageName,
-              metrics: {
-                performance: liveResult.mobile.performance,
-                accessibility: liveResult.mobile.accessibility,
-                bestPractices: liveResult.mobile.bestPractices,
-                seo: liveResult.mobile.seo,
-                totalBlockingTime: liveResult.mobile.totalBlockingTime,
-              },
-              screenshotUrl: liveResult.mobile.screenshotUrl,
-              screenshotDataUri: liveResult.mobile.screenshotDataUri,
-              reportUrl: liveResult.mobile.reportUrl,
-            },
-            desktop: {
-              url: parsedUrl,
-              strategy: 'desktop',
-              pageName: liveResult.pageName,
-              metrics: {
-                performance: liveResult.desktop.performance,
-                accessibility: liveResult.desktop.accessibility,
-                bestPractices: liveResult.desktop.bestPractices,
-                seo: liveResult.desktop.seo,
-                totalBlockingTime: liveResult.desktop.totalBlockingTime,
-              },
-              screenshotUrl: liveResult.desktop.screenshotUrl,
-              screenshotDataUri: liveResult.desktop.screenshotDataUri,
-              reportUrl: liveResult.desktop.reportUrl,
-            },
-          });
-        }
-      } catch (liveErr) {
-        console.error('Puppeteer live audit error:', liveErr);
       }
     }
 
