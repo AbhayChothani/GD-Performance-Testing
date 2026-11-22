@@ -62,9 +62,18 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     (chromium as any).setHeadlessMode = true;
     (chromium as any).setGraphicsMode = false;
 
+    // Ensure AL2023 shared libraries (libnss3.so, etc.) are found
+    process.env.LD_LIBRARY_PATH = [
+      '/tmp/al2023/lib',
+      '/tmp/lib',
+      process.env.LD_LIBRARY_PATH,
+    ]
+      .filter(Boolean)
+      .join(':');
+
     const CHROMIUM_PACK_URL =
       process.env.CHROMIUM_PACK_URL ||
-      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar';
+      'https://github.com/Sparticuz/chromium/releases/download/v133.0.0/chromium-v133.0.0-pack.tar';
 
     const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
 
