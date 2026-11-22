@@ -108,8 +108,19 @@ export async function POST(req: NextRequest) {
         });
       }
     } catch (liveErr) {
-      console.warn('Headless browser audit failed, falling back:', liveErr);
-      lastApiError = liveErr instanceof Error ? liveErr.message : 'Headless audit error';
+      console.error('Headless browser audit failed:', liveErr);
+      const errMsg = liveErr instanceof Error ? liveErr.message : 'Headless audit error';
+      // Do NOT silently fall back on Vercel: return the actual error message directly
+      if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        return NextResponse.json(
+          {
+            error: errMsg,
+            stack: liveErr instanceof Error ? liveErr.stack : undefined,
+          },
+          { status: 500 }
+        );
+      }
+      lastApiError = errMsg;
     }
 
     // 2. Secondary Fallback: If an API key is provided, run official Google Cloud PageSpeed API

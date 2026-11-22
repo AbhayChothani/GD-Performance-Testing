@@ -55,34 +55,36 @@ function getBrowserExecutablePath(): string {
 }
 
 export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAuditOutput> {
-  let executablePath: string;
-  let launchArgs: string[];
-  let isHeadless: boolean | 'shell' = true;
+  let browser;
 
   if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const chromium = (await import('@sparticuz/chromium')).default;
-    executablePath = await chromium.executablePath();
-    launchArgs = chromium.args;
-    isHeadless = (chromium as unknown as { headless?: boolean | 'shell' }).headless ?? true;
+    (chromium as any).setHeadlessMode = true;
+    (chromium as any).setGraphicsMode = false;
+
+    browser = await puppeteer.launch({
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+      defaultViewport: (chromium as any).defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    });
   } else {
-    executablePath = getBrowserExecutablePath();
+    const executablePath = getBrowserExecutablePath();
     if (!fs.existsSync(executablePath)) {
       throw new Error(`Chrome / Edge executable not found at ${executablePath}`);
     }
-    launchArgs = [
+    const launchArgs = [
       '--no-sandbox',
       '--disable-dev-shm-usage',
       '--disable-blink-features=AutomationControlled',
       '--disable-gpu',
     ];
-    isHeadless = true;
+    browser = await puppeteer.launch({
+      executablePath,
+      headless: true,
+      args: launchArgs,
+    });
   }
-
-  const browser = await puppeteer.launch({
-    executablePath,
-    headless: isHeadless,
-    args: launchArgs,
-  });
 
   try {
     const page = await browser.newPage();
