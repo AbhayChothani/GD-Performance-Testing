@@ -48,6 +48,69 @@ export default function HomePage() {
     });
   };
 
+  // Helper to execute audit request with up to 2 automatic retries on network / timeout failure
+  const fetchAuditWithRetry = async (
+    targetUrl: string,
+    apiKeyVal?: string,
+    maxRetries = 2,
+    onRetry?: (attempt: number) => void
+  ) => {
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (cancelRequestedRef.current) {
+        throw new Error('Audit cancelled');
+      }
+
+      if (attempt > 0) {
+        if (onRetry) onRetry(attempt);
+        // Wait 3 seconds before retrying
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+
+      try {
+        const res = await fetch('/api/pagespeed', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: targetUrl, strategy: 'both', apiKey: apiKeyVal }),
+        });
+
+        // If server timed out with 504 / 502 / 503
+        if (res.status === 504 || res.status === 502 || res.status === 503) {
+          throw new Error(`Server timeout (${res.status})`);
+        }
+
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Failed to complete audit');
+        }
+
+        return data;
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        lastError = error;
+        const msg = error.message.toLowerCase();
+        const isRetryable =
+          msg.includes('failed to fetch') ||
+          msg.includes('network') ||
+          msg.includes('timeout') ||
+          msg.includes('504') ||
+          msg.includes('502') ||
+          msg.includes('503') ||
+          msg.includes('load failed');
+
+        if (isRetryable && attempt < maxRetries) {
+          console.warn(
+            `Audit for ${targetUrl} failed with "${error.message}". Retrying in 3s (Attempt ${attempt + 1}/${maxRetries})...`
+          );
+          continue;
+        }
+
+        throw error;
+      }
+    }
+    throw lastError || new Error('Audit failed');
+  };
+
   // Run Batch PageSpeed Audit
   const handleRunAudit = async (urls: string[]) => {
     if (urls.length === 0 || isAuditing) return;
@@ -106,7 +169,7 @@ export default function HomePage() {
       status: 'running',
     });
 
-    // Process sequentially with polite delay to respect API quotas
+    // Process sequentially with concurrency = 1 to guarantee full CPU/RAM on Vercel
     for (let i = 0; i < total; i++) {
       if (cancelRequestedRef.current) {
         setProgress((prev) => ({ ...prev, status: 'cancelled' }));
@@ -132,17 +195,15 @@ export default function HomePage() {
       });
 
       try {
-        const res = await fetch('/api/pagespeed', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: currentUrl, strategy: 'both', apiKey }),
+        const data = await fetchAuditWithRetry(currentUrl, apiKey, 2, (attempt) => {
+          setItems((prev) =>
+            prev.map((item) =>
+              item.id === itemId
+                ? { ...item, pageName: `Retrying (attempt ${attempt}/2)...` }
+                : item
+            )
+          );
         });
-
-        const data = await res.json();
-
-        if (!res.ok || data.error) {
-          throw new Error(data.error || 'Failed to complete audit');
-        }
 
         const mMetrics = data.mobile?.metrics || {};
         const dMetrics = data.desktop?.metrics || {};
@@ -205,9 +266,9 @@ export default function HomePage() {
         );
       }
 
-      // Small 400ms delay between audits
+      // 1000ms polite pause between audits to allow serverless memory recycling
       if (i < total - 1) {
-        await new Promise((r) => setTimeout(r, 400));
+        await new Promise((r) => setTimeout(r, 1000));
       }
     }
 
@@ -224,7 +285,7 @@ export default function HomePage() {
     });
   };
 
-  // Re-audit an individual item
+  // Re-audit an individual item with auto-retry
   const handleReauditUrl = async (url: string, itemId: string) => {
     setItems((prev) =>
       prev.map((item) =>
@@ -262,13 +323,7 @@ export default function HomePage() {
     );
 
     try {
-      const res = await fetch('/api/pagespeed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, strategy: 'both', apiKey }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Audit failed');
+      const data = await fetchAuditWithRetry(url, apiKey, 2);
 
       setItems((prev) =>
         prev.map((item) => {

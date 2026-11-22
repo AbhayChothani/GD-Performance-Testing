@@ -145,8 +145,13 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     // 3. Wait for Google analysis to complete and redirect to snapshot URL (/analysis/<slug>/<report-id>)
     try {
       await page.waitForFunction(
-        () => window.location.pathname.split('/').length >= 4 && !window.location.search.includes('url='),
-        { timeout: 45000 }
+        () => {
+          const pathParts = window.location.pathname.split('/');
+          const hasRedirect = pathParts.length >= 4 && !window.location.search.includes('url=');
+          const hasGauges = document.querySelectorAll('.lh-gauge__percentage').length >= 4;
+          return hasRedirect || hasGauges;
+        },
+        { timeout: 35000 }
       );
     } catch {
       // If pathname hasn't redirected yet, loop below continues polling
@@ -155,12 +160,11 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     let finalMobileUrl = '';
     let mScores: number[] = [];
 
-    for (let i = 0; i < 32; i++) {
-      await new Promise((r) => setTimeout(r, 1500));
+    for (let i = 0; i < 16; i++) {
       const currentUrl = page.url();
 
       // Ensure currentUrl has redirected away from ?url= to static snapshot URL format: /analysis/<slug>/<report-id>
-      if (currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) {
+      if ((currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) || i > 3) {
         mScores = await page.evaluate(() => {
           const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
           const visible = gauges.filter((g) => {
@@ -183,6 +187,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
           break;
         }
       }
+      await new Promise((r) => setTimeout(r, 1200));
     }
 
     if (!finalMobileUrl) {
@@ -423,10 +428,25 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       },
     };
   } finally {
-    try {
-      await browser.close();
-    } catch {
-      // Ignore
+    if (browser) {
+      try {
+        const pages = await browser.pages().catch(() => []);
+        for (const p of pages) {
+          await p.close().catch(() => {});
+        }
+        await browser.close();
+      } catch (err) {
+        console.warn('Error during browser close in finally block:', err);
+      } finally {
+        try {
+          const proc = browser.process();
+          if (proc && !proc.killed) {
+            proc.kill('SIGKILL');
+          }
+        } catch {
+          // Ignore
+        }
+      }
     }
   }
 }
