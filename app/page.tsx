@@ -336,8 +336,8 @@ export default function HomePage() {
             tbt: tbtVal,
           });
 
-          if (!updatedMetrics.reportUrl || !updatedMetrics.reportUrl.startsWith('https://pagespeed.web.dev/analysis')) {
-            updatedMetrics.reportUrl = buildPageSpeedSnapshotUrl(item.pageUrl, targetStrategy, currentMetrics.reportUrl);
+          if (!updatedMetrics.reportUrl || !updatedMetrics.reportUrl.includes('analysis?url=')) {
+            updatedMetrics.reportUrl = buildPageSpeedSnapshotUrl(item.pageUrl, targetStrategy);
           }
           const currentScrUrl = currentMetrics.screenshotUrl || '';
           const baseScr = currentScrUrl.split('?')[0] || `/api/screenshot/audit-${targetStrategy}`;

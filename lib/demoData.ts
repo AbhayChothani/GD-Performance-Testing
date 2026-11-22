@@ -67,7 +67,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 380,
       "screenshotUrl": "https://prnt.sc/kpoDRZTmtZkY",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com/hg2pah6wia?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -79,7 +79,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 140,
       "screenshotUrl": "https://prnt.sc/opIibonXKT3d",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com/hg2pah6wia?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -99,7 +99,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 230,
       "screenshotUrl": "https://prnt.sc/nG7PpyUlIsW0",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-product-engineering/piqls8r8tq?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fproduct-engineering%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -111,7 +111,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 80,
       "screenshotUrl": "https://prnt.sc/kY-xETnNj6Su",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-product-engineering/piqls8r8tq?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fproduct-engineering%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -131,7 +131,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 120,
       "screenshotUrl": "https://prnt.sc/z5aLBXhh4iBT",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ecommerce-solution/muyn5933r5?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fecommerce-solution%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -143,7 +143,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 420,
       "screenshotUrl": "https://prnt.sc/TswNAf0ALFZ0",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ecommerce-solution/muyn5933r5?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fecommerce-solution%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -163,7 +163,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 800,
       "screenshotUrl": "https://prnt.sc/mFL-AMuwSdsn",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-web-application-development/2dzv9lwhqf?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fweb-application-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -175,7 +175,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 20,
       "screenshotUrl": "https://prnt.sc/tZJnuwH6ddr8",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-web-application-development/2dzv9lwhqf?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fweb-application-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -195,7 +195,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 280,
       "screenshotUrl": "https://prnt.sc/8Y0UMjkzCldZ",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-dedicated-development-center/axl94d000l?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fdedicated-development-center%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -207,7 +207,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 70,
       "screenshotUrl": "https://prnt.sc/pL3taRG-dldu",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-dedicated-development-center/axl94d000l?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fdedicated-development-center%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -227,7 +227,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 200,
       "screenshotUrl": "https://prnt.sc/YXOmVHweM_Mi",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-quality-assurance/iekudi8wkf?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fquality-assurance%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -239,7 +239,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 400,
       "screenshotUrl": "https://prnt.sc/lzWdfwJzy1JN",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-services-quality-assurance/iekudi8wkf?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fservices%2Fquality-assurance%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -259,7 +259,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 380,
       "screenshotUrl": "https://prnt.sc/-md6afxdIGql",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-developer/vzk4dr9qwj?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-developer%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -271,7 +271,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 60,
       "screenshotUrl": "https://prnt.sc/wNOempe1DMwA",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-developer/vzk4dr9qwj?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-developer%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -291,7 +291,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 600,
       "screenshotUrl": "https://prnt.sc/wZufQKiNzIxN",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-asp-net-development-company/ujec01i7v8?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fasp-net-development-company%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -303,7 +303,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 110,
       "screenshotUrl": "https://prnt.sc/CDZgMZsTKiFc",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-asp-net-development-company/ujec01i7v8?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fasp-net-development-company%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -323,7 +323,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 910,
       "screenshotUrl": "https://prnt.sc/8Zt6ND3hIBq4",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-asp-net-core-development/fgt9wunwhc?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fasp-net-core-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -335,7 +335,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 110,
       "screenshotUrl": "https://prnt.sc/RUm2eAaj2fXm",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-asp-net-core-development/fgt9wunwhc?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fasp-net-core-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -355,7 +355,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 770,
       "screenshotUrl": "https://prnt.sc/0Aehf9TyHx6g",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-hire-sitecore-developers/kvr4w881ei?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhire-sitecore-developers%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -367,7 +367,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 720,
       "screenshotUrl": "https://prnt.sc/wYXDGjt9SMh8",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-hire-sitecore-developers/kvr4w881ei?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhire-sitecore-developers%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -387,7 +387,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 140,
       "screenshotUrl": "https://prnt.sc/9_MoqwRCXg2o",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-react-js-development-company/rjqtqk3rlm?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freact-js-development-company%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -399,7 +399,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 310,
       "screenshotUrl": "https://prnt.sc/rsIwqfbiNbev",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-react-js-development-company/rjqtqk3rlm?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freact-js-development-company%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -419,7 +419,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 350,
       "screenshotUrl": "https://prnt.sc/SikokOybEo6n",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-vue-js-development-company/t1q43arhg6?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fvue-js-development-company%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -431,7 +431,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 200,
       "screenshotUrl": "https://prnt.sc/kY9gMNALXS1b",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-vue-js-development-company/t1q43arhg6?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fvue-js-development-company%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -451,7 +451,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 490,
       "screenshotUrl": "https://prnt.sc/p_ArBd5fK9Wc",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-heartcore/n0gplorat3?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-heartcore%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -463,7 +463,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 50,
       "screenshotUrl": "https://prnt.sc/aOTN_ziNxuGW",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-heartcore/n0gplorat3?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-heartcore%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -483,7 +483,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 410,
       "screenshotUrl": "https://prnt.sc/4uvsWe1P3ZQp",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-react-native-app-development/w3xx7vl5ll?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freact-native-app-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -495,7 +495,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 380,
       "screenshotUrl": "https://prnt.sc/ixRgnd0rnoVo",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-react-native-app-development/w3xx7vl5ll?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freact-native-app-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -515,7 +515,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 530,
       "screenshotUrl": "https://prnt.sc/2uzbZ5pPg-Ge",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-hire-laravel-developer/xuddpm1lnh?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhire-laravel-developer%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -527,7 +527,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 340,
       "screenshotUrl": "https://prnt.sc/yn15ERrWAyGR",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-hire-laravel-developer/xuddpm1lnh?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhire-laravel-developer%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -547,7 +547,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 340,
       "screenshotUrl": "https://prnt.sc/GSoniFzsNAd0",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-angular-development-company/1vrzq6kve4?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fangular-development-company%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -559,7 +559,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 110,
       "screenshotUrl": "https://prnt.sc/BTrOgGv2NFQq",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-angular-development-company/1vrzq6kve4?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fangular-development-company%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -579,7 +579,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 90,
       "screenshotUrl": "https://prnt.sc/XbA2ErGi6Q-5",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-node-js-development-company/mcbecq1v8y?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fnode-js-development-company%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -591,7 +591,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 120,
       "screenshotUrl": "https://prnt.sc/ouJ5wWZsWGwh",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-node-js-development-company/mcbecq1v8y?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fnode-js-development-company%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -611,7 +611,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 470,
       "screenshotUrl": "https://prnt.sc/QsNpctzkKotq",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-agency/522jkaodnt?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-agency%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -623,7 +623,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 280,
       "screenshotUrl": "https://prnt.sc/QF4hmaGEVM3x",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-agency/522jkaodnt?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-agency%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -643,7 +643,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 490,
       "screenshotUrl": "https://prnt.sc/oQjoN-57Z5b5",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-case-study/vf5bm8ob5i?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcase-study%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -655,7 +655,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 330,
       "screenshotUrl": "https://prnt.sc/hJLbtzvqPBJa",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-case-study/vf5bm8ob5i?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcase-study%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -675,7 +675,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 120,
       "screenshotUrl": "https://prnt.sc/JYLM6nCwPuBt",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about/y3p6a3fjct?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -687,7 +687,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 50,
       "screenshotUrl": "https://prnt.sc/zxad9vHQpIXh",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about/y3p6a3fjct?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -707,7 +707,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 30,
       "screenshotUrl": "https://prnt.sc/5u7LYHPn5zy3",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-career/hf64jyaffm?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcareer%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -719,7 +719,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 10,
       "screenshotUrl": "https://prnt.sc/MzV_HpEujADf",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-career/hf64jyaffm?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcareer%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -739,7 +739,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 50,
       "screenshotUrl": "https://prnt.sc/Z0MSuHIV10VU",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-our-culture/sqscnuqkcv?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Four-culture%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -751,7 +751,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 20,
       "screenshotUrl": "https://prnt.sc/VhAyDrD4L7az",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-our-culture/sqscnuqkcv?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Four-culture%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -771,7 +771,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 580,
       "screenshotUrl": "https://prnt.sc/H9j8uiUJXNyk",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-contact-us/cm6ggs6lu9?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcontact-us%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -783,7 +783,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 580,
       "screenshotUrl": "https://prnt.sc/T5CCegkyvhYg",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-contact-us/cm6ggs6lu9?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcontact-us%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -803,7 +803,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 250,
       "screenshotUrl": "https://prnt.sc/Q04y9z2V8it1",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-privacy-policy/sz7bnn6cg8?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fprivacy-policy%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -815,7 +815,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 40,
       "screenshotUrl": "https://prnt.sc/exu4yYmQZpW8",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-privacy-policy/sz7bnn6cg8?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fprivacy-policy%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -835,7 +835,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 1320,
       "screenshotUrl": "https://prnt.sc/o5nMvnH7_fnP",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-leadership-team/02nngp9yay?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fleadership-team%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -847,7 +847,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 410,
       "screenshotUrl": "https://prnt.sc/3dcYScXKHsX2",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-leadership-team/02nngp9yay?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fleadership-team%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -867,7 +867,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 120,
       "screenshotUrl": "https://prnt.sc/0imWq1Ve_qmV",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-awards-certifications/cetc83lboz?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fawards-certifications%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -879,7 +879,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 130,
       "screenshotUrl": "https://prnt.sc/tllnJ7vhZSWm",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-awards-certifications/cetc83lboz?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fawards-certifications%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -899,7 +899,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 150,
       "screenshotUrl": "https://prnt.sc/p32koS8k2FyJ",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-csr/nf8gpq1xvf?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fcsr%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -911,7 +911,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 110,
       "screenshotUrl": "https://prnt.sc/3R7AwHrpnrcr",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-about-csr/nf8gpq1xvf?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fabout%2Fcsr%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -931,7 +931,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 400,
       "screenshotUrl": "https://prnt.sc/LgKrMd555GP_",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ai-automation-consulting/mhadfttosl?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fai-automation-consulting%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -943,7 +943,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 30,
       "screenshotUrl": "https://prnt.sc/Dm8KIm761dqD",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ai-automation-consulting/mhadfttosl?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fai-automation-consulting%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -963,7 +963,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 490,
       "screenshotUrl": "https://prnt.sc/CHDkE6Th5V-U",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-healthcare-industry-solutions/wtcj16q934?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhealthcare-industry-solutions%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -975,7 +975,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 400,
       "screenshotUrl": "https://prnt.sc/DbkgcSmFC5Am",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-healthcare-industry-solutions/wtcj16q934?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fhealthcare-industry-solutions%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -995,7 +995,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 530,
       "screenshotUrl": "https://prnt.sc/vq3PNpkZ1GOJ",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-digital-insurance/jnmbf5l8ea?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fdigital-insurance%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1007,7 +1007,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 480,
       "screenshotUrl": "https://prnt.sc/4TuQvcQ4azE3",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-digital-insurance/jnmbf5l8ea?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fdigital-insurance%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1027,7 +1027,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 230,
       "screenshotUrl": "https://prnt.sc/cNcYxo2fftLQ",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-media-entertainment-software-solutions/64l630idrh?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fmedia-entertainment-software-solutions%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1039,7 +1039,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 340,
       "screenshotUrl": "https://prnt.sc/N1rjXH2RQFiE",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-media-entertainment-software-solutions/64l630idrh?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fmedia-entertainment-software-solutions%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1059,7 +1059,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 140,
       "screenshotUrl": "https://prnt.sc/E0eAP_FiWxIs",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-retail-and-hospitality-business-solutions/hnqow3894m?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fretail-and-hospitality-business-solutions%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1071,7 +1071,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 500,
       "screenshotUrl": "https://prnt.sc/2zFYV54Ax6MK",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-retail-and-hospitality-business-solutions/hnqow3894m?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fretail-and-hospitality-business-solutions%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1091,7 +1091,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 940,
       "screenshotUrl": "https://prnt.sc/ZmTZrAelproG",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-real-estate-app-development/kutt0kklnz?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freal-estate-app-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1103,7 +1103,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 320,
       "screenshotUrl": "https://prnt.sc/CQ_lODjHbDNf",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-real-estate-app-development/kutt0kklnz?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Freal-estate-app-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1123,7 +1123,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 540,
       "screenshotUrl": "https://prnt.sc/DE-lVvaxai2k",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-travel-app-development/ih4gq9hkg4?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Ftravel-app-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1135,7 +1135,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 290,
       "screenshotUrl": "https://prnt.sc/fAysvoLQLTYQ",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-travel-app-development/ih4gq9hkg4?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Ftravel-app-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1155,7 +1155,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 340,
       "screenshotUrl": "https://prnt.sc/3U8T5uPkbEpX",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ecommerce-development/apja8fjxdo?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fecommerce-development%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1167,7 +1167,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 390,
       "screenshotUrl": "https://prnt.sc/kFEiMCrFsIBx",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-ecommerce-development/apja8fjxdo?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fecommerce-development%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1187,7 +1187,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 85,
       "totalBlockingTime": 250,
       "screenshotUrl": "https://prnt.sc/JfP53221JJ6u",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-blogs/ynfa9j9rmy?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fblogs%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1199,7 +1199,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 85,
       "totalBlockingTime": 120,
       "screenshotUrl": "https://prnt.sc/NSrTFrS1Dnqr",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-blogs/ynfa9j9rmy?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fblogs%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1219,7 +1219,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 100,
       "screenshotUrl": "https://prnt.sc/XLgh8FOkNEc8",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-company-events-global-participation/9m19kviu7b?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcompany-events-global-participation%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1231,7 +1231,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 180,
       "screenshotUrl": "https://prnt.sc/4PcA0nfJxNzj",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-company-events-global-participation/9m19kviu7b?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fcompany-events-global-participation%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1251,7 +1251,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 100,
       "screenshotUrl": "https://prnt.sc/RkEVXxIHQf5n",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-codegarden/e33lxsojyn?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-codegarden%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1263,7 +1263,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 80,
       "screenshotUrl": "https://prnt.sc/fmkJvTBZxqvv",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-codegarden/e33lxsojyn?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-codegarden%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1283,7 +1283,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 150,
       "screenshotUrl": "https://prnt.sc/aJe-64ot3CsC",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-community-day/fa73p9cc6e?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-community-day%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1295,7 +1295,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 350,
       "screenshotUrl": "https://prnt.sc/JQeJjCarL0Wf",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-community-day/fa73p9cc6e?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-community-day%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1315,7 +1315,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 60,
       "screenshotUrl": "https://prnt.sc/bp3n5iRYt6Eu",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-gitex-global/3u7wkdyel2?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fgitex-global%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1327,7 +1327,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 92,
       "totalBlockingTime": 80,
       "screenshotUrl": "https://prnt.sc/Jv0nshJoIg7q",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-gitex-global/3u7wkdyel2?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fgitex-global%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
@@ -1347,7 +1347,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 290,
       "screenshotUrl": "https://prnt.sc/mJXX9cvhjJqc",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-version/c16j9ydc2m?form_factor=mobile",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-version%2F&form_factor=mobile",
       "comment": "",
       "status": "completed"
     },
@@ -1359,7 +1359,7 @@ export const DEMO_ITEMS: PageAuditItem[] = [
       "seo": 100,
       "totalBlockingTime": 150,
       "screenshotUrl": "https://prnt.sc/hM0lv8gf_9dx",
-      "reportUrl": "https://pagespeed.web.dev/analysis/https-www-girirajdigital-com-umbraco-version/c16j9ydc2m?form_factor=desktop",
+      "reportUrl": "https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fwww.girirajdigital.com%2Fumbraco-version%2F&form_factor=desktop",
       "comment": "",
       "status": "completed"
     },
