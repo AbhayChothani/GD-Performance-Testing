@@ -62,9 +62,9 @@ export const ReportTable: React.FC<ReportTableProps> = ({
     });
   };
 
-  const getScoreCellStyle = (score: number | null) => {
-    if (score === null || score === undefined) {
-      return 'bg-slate-50 text-slate-400';
+  const getScoreCellStyle = (score: number | null | undefined, isLoading?: boolean) => {
+    if (isLoading || score === null || score === undefined || typeof score !== 'number') {
+      return 'bg-slate-50 text-slate-400 font-medium';
     }
     if (score >= 90) {
       return 'bg-[#38761D] text-white font-bold';
@@ -205,7 +205,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 5. Performance */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.mobile.performance
+                        item.mobile.performance,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.mobile.performance !== null ? item.mobile.performance : '-')}
@@ -214,7 +215,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 6. Accessibility */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.mobile.accessibility
+                        item.mobile.accessibility,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.mobile.accessibility !== null ? item.mobile.accessibility : '-')}
@@ -223,7 +225,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 7. Best Practices */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.mobile.bestPractices
+                        item.mobile.bestPractices,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.mobile.bestPractices !== null ? item.mobile.bestPractices : '-')}
@@ -232,7 +235,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 8. SEO */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.mobile.seo
+                        item.mobile.seo,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.mobile.seo !== null ? item.mobile.seo : '-')}
@@ -260,7 +264,9 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
-                      {item.mobile.screenshotUrl ? (
+                      {isItemRunning ? (
+                        <span className="text-slate-400 italic text-[11px]">Generating...</span>
+                      ) : item.mobile.screenshotUrl ? (
                         <div className="flex items-center gap-1.5">
                           <a
                             href={item.mobile.screenshotUrl}
@@ -327,12 +333,12 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                       >
                         <button
                           type="button"
-                          disabled={isAuditing}
+                          disabled={isAuditing || isItemRunning}
                           onClick={() => onReauditUrl(item.pageUrl, item.id)}
                           className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition disabled:opacity-40"
-                          title="Re-audit this URL"
+                          title={isItemRunning ? 'Auditing...' : 'Re-audit this URL'}
                         >
-                          <RotateCw className="w-3.5 h-3.5" />
+                          <RotateCw className={`w-3.5 h-3.5 ${isItemRunning ? 'animate-spin text-emerald-600' : ''}`} />
                         </button>
                       </td>
                     )}
@@ -357,7 +363,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 5. Performance */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.desktop.performance
+                        item.desktop.performance,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.desktop.performance !== null ? item.desktop.performance : '-')}
@@ -366,7 +373,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 6. Accessibility */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.desktop.accessibility
+                        item.desktop.accessibility,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.desktop.accessibility !== null ? item.desktop.accessibility : '-')}
@@ -375,7 +383,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 7. Best Practices */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.desktop.bestPractices
+                        item.desktop.bestPractices,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.desktop.bestPractices !== null ? item.desktop.bestPractices : '-')}
@@ -384,7 +393,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     {/* 8. SEO */}
                     <td
                       className={`border border-black px-2 py-2 text-center align-middle font-bold text-sm select-none ${getScoreCellStyle(
-                        item.desktop.seo
+                        item.desktop.seo,
+                        isItemRunning
                       )}`}
                     >
                       {isItemRunning ? '...' : (item.desktop.seo !== null ? item.desktop.seo : '-')}
@@ -412,7 +422,9 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 10. Links (Screenshot preview) */}
                     <td className="border border-black px-3 py-2 align-middle">
-                      {item.desktop.screenshotUrl ? (
+                      {isItemRunning ? (
+                        <span className="text-slate-400 italic text-[11px]">Generating...</span>
+                      ) : item.desktop.screenshotUrl ? (
                         <div className="flex items-center gap-1.5">
                           <a
                             href={item.desktop.screenshotUrl}

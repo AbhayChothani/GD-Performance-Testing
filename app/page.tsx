@@ -226,8 +226,30 @@ export default function HomePage() {
           ? {
               ...item,
               status: 'running',
-              mobile: { ...item.mobile, reportUrl: '', status: 'running' },
-              desktop: { ...item.desktop, reportUrl: '', status: 'running' },
+              mobile: {
+                ...item.mobile,
+                performance: null,
+                accessibility: null,
+                bestPractices: null,
+                seo: null,
+                totalBlockingTime: null,
+                screenshotUrl: null,
+                screenshotDataUri: null,
+                reportUrl: '',
+                status: 'running',
+              },
+              desktop: {
+                ...item.desktop,
+                performance: null,
+                accessibility: null,
+                bestPractices: null,
+                seo: null,
+                totalBlockingTime: null,
+                screenshotUrl: null,
+                screenshotDataUri: null,
+                reportUrl: '',
+                status: 'running',
+              },
             }
           : item
       )
@@ -257,9 +279,10 @@ export default function HomePage() {
               bestPractices: data.mobile?.metrics?.bestPractices ?? 0,
               seo: data.mobile?.metrics?.seo ?? 0,
               totalBlockingTime: data.mobile?.metrics?.totalBlockingTime ?? 0,
-              screenshotUrl: data.mobile?.screenshotUrl || item.mobile.screenshotUrl,
-              screenshotDataUri: data.mobile?.screenshotDataUri || item.mobile.screenshotDataUri,
-              reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || item.mobile.reportUrl,
+              screenshotUrl: data.mobile?.screenshotUrl || null,
+              screenshotDataUri: data.mobile?.screenshotDataUri || null,
+              reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || '',
+              status: 'completed',
             },
             desktop: {
               ...item.desktop,
@@ -268,9 +291,10 @@ export default function HomePage() {
               bestPractices: data.desktop?.metrics?.bestPractices ?? 0,
               seo: data.desktop?.metrics?.seo ?? 0,
               totalBlockingTime: data.desktop?.metrics?.totalBlockingTime ?? 0,
-              screenshotUrl: data.desktop?.screenshotUrl || item.desktop.screenshotUrl,
-              screenshotDataUri: data.desktop?.screenshotDataUri || item.desktop.screenshotDataUri,
-              reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || item.desktop.reportUrl,
+              screenshotUrl: data.desktop?.screenshotUrl || null,
+              screenshotDataUri: data.desktop?.screenshotDataUri || null,
+              reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || '',
+              status: 'completed',
             },
           };
         })
