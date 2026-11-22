@@ -243,23 +243,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
-                    <td className="border border-black px-2 py-1 text-right font-mono font-medium text-slate-800 align-middle">
-                      {isItemRunning ? (
-                        '...'
-                      ) : (
-                        <input
-                          type="number"
-                          min={0}
-                          value={item.mobile.totalBlockingTime !== null ? item.mobile.totalBlockingTime : ''}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-                            onMetricChange?.(item.id, 'Mobile', 'totalBlockingTime', isNaN(val) ? 0 : val);
-                          }}
-                          placeholder="-"
-                          className="w-16 text-right bg-transparent font-mono font-semibold focus:outline-none focus:border-emerald-500 rounded px-1 py-0.5 cursor-pointer"
-                          title="Click to edit Mobile TBT (ms)"
-                        />
-                      )}
+                    <td className="border border-black px-3 py-2 text-right font-mono font-semibold text-slate-800 align-middle select-none">
+                      {isItemRunning ? '...' : (item.mobile.totalBlockingTime !== null ? item.mobile.totalBlockingTime : '-')}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}
@@ -297,7 +282,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {(item.status === 'running' || item.status === 'pending') && !item.mobile.reportUrl ? (
+                      {isItemRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.mobile.reportUrl ? (
                         <a
@@ -310,7 +295,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                           {item.mobile.reportUrl}
                         </a>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-slate-400 italic text-[11px]">-</span>
                       )}
                     </td>
 
@@ -401,23 +386,8 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                     </td>
 
                     {/* 9. Total Blocking Time (ms) */}
-                    <td className="border border-black px-2 py-1 text-right font-mono font-medium text-slate-800 align-middle">
-                      {isItemRunning ? (
-                        '...'
-                      ) : (
-                        <input
-                          type="number"
-                          min={0}
-                          value={item.desktop.totalBlockingTime !== null ? item.desktop.totalBlockingTime : ''}
-                          onChange={(e) => {
-                            const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
-                            onMetricChange?.(item.id, 'Desktop', 'totalBlockingTime', isNaN(val) ? 0 : val);
-                          }}
-                          placeholder="-"
-                          className="w-16 text-right bg-transparent font-mono font-semibold focus:outline-none focus:border-emerald-500 rounded px-1 py-0.5 cursor-pointer"
-                          title="Click to edit Desktop TBT (ms)"
-                        />
-                      )}
+                    <td className="border border-black px-3 py-2 text-right font-mono font-semibold text-slate-800 align-middle select-none">
+                      {isItemRunning ? '...' : (item.desktop.totalBlockingTime !== null ? item.desktop.totalBlockingTime : '-')}
                     </td>
 
                     {/* 10. Links (Screenshot preview) */}
@@ -455,7 +425,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {(item.status === 'running' || item.status === 'pending') && !item.desktop.reportUrl ? (
+                      {isItemRunning ? (
                         <span className="text-slate-400 italic text-[11px]">Generating...</span>
                       ) : item.desktop.reportUrl ? (
                         <a
@@ -468,7 +438,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({
                           {item.desktop.reportUrl}
                         </a>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-slate-400 italic text-[11px]">-</span>
                       )}
                     </td>
 
