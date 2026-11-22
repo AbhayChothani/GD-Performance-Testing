@@ -86,7 +86,8 @@ export async function POST(req: NextRequest) {
             },
             screenshotUrl: liveResult.mobile.screenshotUrl,
             screenshotDataUri: liveResult.mobile.screenshotDataUri,
-            reportUrl: liveResult.mobile.reportUrl,
+            reportUrl: liveResult.mobile.detailReportUrl || liveResult.mobile.reportUrl,
+            detailReportUrl: liveResult.mobile.detailReportUrl || liveResult.mobile.reportUrl,
           },
           desktop: {
             url: parsedUrl,
@@ -101,7 +102,8 @@ export async function POST(req: NextRequest) {
             },
             screenshotUrl: liveResult.desktop.screenshotUrl,
             screenshotDataUri: liveResult.desktop.screenshotDataUri,
-            reportUrl: liveResult.desktop.reportUrl,
+            reportUrl: liveResult.desktop.detailReportUrl || liveResult.desktop.reportUrl,
+            detailReportUrl: liveResult.desktop.detailReportUrl || liveResult.desktop.reportUrl,
           },
         });
       }

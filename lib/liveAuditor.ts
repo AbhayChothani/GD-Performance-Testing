@@ -17,6 +17,7 @@ export interface LiveAuditOutput {
     seo: number;
     totalBlockingTime: number;
     reportUrl: string;
+    detailReportUrl: string;
     screenshotUrl?: string;
     screenshotDataUri?: string;
   };
@@ -27,6 +28,7 @@ export interface LiveAuditOutput {
     seo: number;
     totalBlockingTime: number;
     reportUrl: string;
+    detailReportUrl: string;
     screenshotUrl?: string;
     screenshotDataUri?: string;
   };
@@ -118,7 +120,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
       await new Promise((r) => setTimeout(r, 2000));
       const currentUrl = page.url();
 
-      if (currentUrl.includes('/analysis/')) {
+      // Ensure currentUrl has redirected away from ?url= to static snapshot URL format: /analysis/<slug>/<report-id>
+      if (currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) {
         mScores = await page.evaluate(() => {
           const gauges = Array.from(document.querySelectorAll<HTMLElement>('.lh-gauge__percentage'));
           const visible = gauges.filter((g) => {
@@ -140,6 +143,15 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
             : `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}form_factor=mobile`;
           break;
         }
+      }
+    }
+
+    if (!finalMobileUrl) {
+      const currentUrl = page.url();
+      if (currentUrl.includes('/analysis/') && !currentUrl.includes('?url=')) {
+        finalMobileUrl = currentUrl.includes('form_factor=mobile')
+          ? currentUrl
+          : `${currentUrl}${currentUrl.includes('?') ? '&' : '?'}form_factor=mobile`;
       }
     }
 
@@ -230,7 +242,7 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
     await new Promise((r) => setTimeout(r, 2500));
 
     let finalDesktopUrl = page.url();
-    if (!finalDesktopUrl.includes('form_factor=desktop')) {
+    if (!finalDesktopUrl.includes('form_factor=desktop') || finalDesktopUrl.includes('?url=')) {
       finalDesktopUrl = finalMobileUrl.replace('form_factor=mobile', 'form_factor=desktop');
     }
 
@@ -345,7 +357,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: mScores[2] ?? 0,
         seo: mScores[3] ?? 0,
         totalBlockingTime: mTbt,
-        reportUrl: buildPageSpeedReportUrl(targetUrl, 'mobile'),
+        reportUrl: finalMobileUrl,
+        detailReportUrl: finalMobileUrl,
         screenshotUrl: mScreenUrl,
         screenshotDataUri: mScreenshotDataUri,
       },
@@ -355,7 +368,8 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
         bestPractices: dScores[2] ?? 0,
         seo: dScores[3] ?? 0,
         totalBlockingTime: dTbt,
-        reportUrl: buildPageSpeedReportUrl(targetUrl, 'desktop'),
+        reportUrl: finalDesktopUrl,
+        detailReportUrl: finalDesktopUrl,
         screenshotUrl: dScreenUrl,
         screenshotDataUri: dScreenshotDataUri,
       },

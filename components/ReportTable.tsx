@@ -291,7 +291,9 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {item.mobile.reportUrl ? (
+                      {(item.status === 'running' || item.status === 'pending') && !item.mobile.reportUrl ? (
+                        <span className="text-slate-400 italic text-[11px]">Generating...</span>
+                      ) : item.mobile.reportUrl ? (
                         <a
                           href={item.mobile.reportUrl}
                           target="_blank"
@@ -441,7 +443,9 @@ export const ReportTable: React.FC<ReportTableProps> = ({
 
                     {/* 11. Link for Detail Description */}
                     <td className="border border-black px-3 py-2 align-middle max-w-[240px]">
-                      {item.desktop.reportUrl ? (
+                      {(item.status === 'running' || item.status === 'pending') && !item.desktop.reportUrl ? (
+                        <span className="text-slate-400 italic text-[11px]">Generating...</span>
+                      ) : item.desktop.reportUrl ? (
                         <a
                           href={item.desktop.reportUrl}
                           target="_blank"

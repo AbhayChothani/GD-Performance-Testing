@@ -18,6 +18,18 @@ export function buildPageSpeedSnapshotUrl(
   strategy: 'mobile' | 'desktop',
   existingReportUrl?: string
 ): string {
+  // If an exact static snapshot URL was captured by Puppeteer (/analysis/<slug>/<report-id>),
+  // preserve it and ensure form_factor matches the target strategy!
+  if (existingReportUrl && existingReportUrl.includes('pagespeed.web.dev/analysis/')) {
+    const match = existingReportUrl.match(/pagespeed\.web\.dev\/analysis\/([^/?#]+)\/([^/?#]+)/i);
+    if (match) {
+      const slug = match[1];
+      const id = match[2];
+      return `https://pagespeed.web.dev/analysis/${slug}/${id}?form_factor=${strategy.toLowerCase()}`;
+    }
+    return existingReportUrl;
+  }
+
   // If existingReportUrl is already in the official ?url= format, preserve it and update form_factor
   if (existingReportUrl && existingReportUrl.includes('pagespeed.web.dev/analysis?url=')) {
     const formFactor = strategy.toLowerCase() === 'desktop' ? 'desktop' : 'mobile';
@@ -27,8 +39,14 @@ export function buildPageSpeedSnapshotUrl(
     return `${existingReportUrl}&form_factor=${formFactor}`;
   }
 
-  // NOTE: Google PageSpeed temporary snapshot IDs (/analysis/<slug>/<report-id>) are ephemeral
-  // and expire immediately, causing "A report does not exist for the ID <id>" errors when opened.
-  // We ALWAYS generate the permanent official Google query parameter URL:
+  if (existingReportUrl && existingReportUrl.startsWith('https://pagespeed.web.dev/')) {
+    return existingReportUrl;
+  }
+
+  // Do not generate a default URL before/during audit if no report URL has been created yet
+  if (!existingReportUrl) {
+    return '';
+  }
+
   return buildPageSpeedReportUrl(targetUrl, strategy);
 }

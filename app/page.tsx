@@ -74,7 +74,7 @@ export default function HomePage() {
           seo: null,
           totalBlockingTime: null,
           screenshotUrl: null,
-          reportUrl: buildPageSpeedSnapshotUrl(u, 'mobile'),
+          reportUrl: '',
           comment: '',
           status: 'pending',
         },
@@ -86,7 +86,7 @@ export default function HomePage() {
           seo: null,
           totalBlockingTime: null,
           screenshotUrl: null,
-          reportUrl: buildPageSpeedSnapshotUrl(u, 'desktop'),
+          reportUrl: '',
           comment: '',
           status: 'pending',
         },
@@ -163,7 +163,7 @@ export default function HomePage() {
                 totalBlockingTime: mMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.mobile?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.mobile?.screenshotDataUri,
-                reportUrl: data.mobile?.reportUrl || buildPageSpeedSnapshotUrl(currentUrl, 'mobile'),
+                reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || '',
                 comment: '',
                 status: 'completed',
               },
@@ -176,7 +176,7 @@ export default function HomePage() {
                 totalBlockingTime: dMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.desktop?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.desktop?.screenshotDataUri,
-                reportUrl: data.desktop?.reportUrl || buildPageSpeedSnapshotUrl(currentUrl, 'desktop'),
+                reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || '',
                 comment: '',
                 status: 'completed',
               },
@@ -221,7 +221,16 @@ export default function HomePage() {
   // Re-audit an individual item
   const handleReauditUrl = async (url: string, itemId: string) => {
     setItems((prev) =>
-      prev.map((item) => (item.id === itemId ? { ...item, status: 'running' } : item))
+      prev.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              status: 'running',
+              mobile: { ...item.mobile, reportUrl: '', status: 'running' },
+              desktop: { ...item.desktop, reportUrl: '', status: 'running' },
+            }
+          : item
+      )
     );
 
     try {
@@ -250,7 +259,7 @@ export default function HomePage() {
               totalBlockingTime: data.mobile?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.mobile?.screenshotUrl || item.mobile.screenshotUrl,
               screenshotDataUri: data.mobile?.screenshotDataUri || item.mobile.screenshotDataUri,
-              reportUrl: data.mobile?.reportUrl || buildPageSpeedSnapshotUrl(url, 'mobile', item.mobile.reportUrl),
+              reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || item.mobile.reportUrl,
             },
             desktop: {
               ...item.desktop,
@@ -261,7 +270,7 @@ export default function HomePage() {
               totalBlockingTime: data.desktop?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.desktop?.screenshotUrl || item.desktop.screenshotUrl,
               screenshotDataUri: data.desktop?.screenshotDataUri || item.desktop.screenshotDataUri,
-              reportUrl: data.desktop?.reportUrl || buildPageSpeedSnapshotUrl(url, 'desktop', item.desktop.reportUrl),
+              reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || item.desktop.reportUrl,
             },
           };
         })
