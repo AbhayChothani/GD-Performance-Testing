@@ -58,14 +58,20 @@ export async function runPlaywrightLiveAudit(targetUrl: string): Promise<LiveAud
   let browser;
 
   if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
-    const chromium = (await import('@sparticuz/chromium')).default;
+    const chromium = (await import('@sparticuz/chromium-min')).default;
     (chromium as any).setHeadlessMode = true;
     (chromium as any).setGraphicsMode = false;
+
+    const CHROMIUM_PACK_URL =
+      process.env.CHROMIUM_PACK_URL ||
+      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar';
+
+    const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
 
     browser = await puppeteer.launch({
       args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: (chromium as any).defaultViewport,
-      executablePath: await chromium.executablePath(),
+      executablePath,
       headless: true,
     });
   } else {
