@@ -163,7 +163,10 @@ export default function HomePage() {
                 totalBlockingTime: mMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.mobile?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.mobile?.screenshotDataUri,
-                reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || '',
+                reportUrl:
+                  data.mobile?.detailReportUrl ||
+                  data.mobile?.reportUrl ||
+                  `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=mobile`,
                 comment: '',
                 status: 'completed',
               },
@@ -176,7 +179,10 @@ export default function HomePage() {
                 totalBlockingTime: dMetrics.totalBlockingTime ?? 0,
                 screenshotUrl: data.desktop?.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${currentUrl}`,
                 screenshotDataUri: data.desktop?.screenshotDataUri,
-                reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || '',
+                reportUrl:
+                  data.desktop?.detailReportUrl ||
+                  data.desktop?.reportUrl ||
+                  `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(currentUrl)}&form_factor=desktop`,
                 comment: '',
                 status: 'completed',
               },
@@ -281,7 +287,10 @@ export default function HomePage() {
               totalBlockingTime: data.mobile?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.mobile?.screenshotUrl || null,
               screenshotDataUri: data.mobile?.screenshotDataUri || null,
-              reportUrl: data.mobile?.detailReportUrl || data.mobile?.reportUrl || '',
+              reportUrl:
+                data.mobile?.detailReportUrl ||
+                data.mobile?.reportUrl ||
+                `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=mobile`,
               status: 'completed',
             },
             desktop: {
@@ -293,7 +302,10 @@ export default function HomePage() {
               totalBlockingTime: data.desktop?.metrics?.totalBlockingTime ?? 0,
               screenshotUrl: data.desktop?.screenshotUrl || null,
               screenshotDataUri: data.desktop?.screenshotDataUri || null,
-              reportUrl: data.desktop?.detailReportUrl || data.desktop?.reportUrl || '',
+              reportUrl:
+                data.desktop?.detailReportUrl ||
+                data.desktop?.reportUrl ||
+                `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=desktop`,
               status: 'completed',
             },
           };

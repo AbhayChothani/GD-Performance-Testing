@@ -122,12 +122,23 @@ export async function POST(req: NextRequest) {
           runPageSpeedAudit(parsedUrl, 'desktop', effectiveApiKey),
         ]);
 
+        const mDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=mobile`;
+        const dDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=desktop`;
+
         if (!mRes.error && !dRes.error) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
-            mobile: mRes,
-            desktop: dRes,
+            mobile: {
+              ...mRes,
+              reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+              detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+            },
+            desktop: {
+              ...dRes,
+              reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+              detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+            },
           });
         }
 
@@ -136,8 +147,17 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: mRes.pageName || derivePageName(parsedUrl),
-            mobile: mRes,
-            desktop: { ...mRes, strategy: 'desktop' },
+            mobile: {
+              ...mRes,
+              reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+              detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+            },
+            desktop: {
+              ...mRes,
+              strategy: 'desktop',
+              reportUrl: dDirectUrl,
+              detailReportUrl: dDirectUrl,
+            },
           });
         }
 
@@ -145,8 +165,17 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({
             url: parsedUrl,
             pageName: dRes.pageName || derivePageName(parsedUrl),
-            mobile: { ...dRes, strategy: 'mobile' },
-            desktop: dRes,
+            mobile: {
+              ...dRes,
+              strategy: 'mobile',
+              reportUrl: mDirectUrl,
+              detailReportUrl: mDirectUrl,
+            },
+            desktop: {
+              ...dRes,
+              reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+              detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+            },
           });
         }
 
@@ -165,11 +194,21 @@ export async function POST(req: NextRequest) {
         runPageSpeedAudit(parsedUrl, 'desktop'),
       ]);
       if (!mRes.error && !dRes.error) {
+        const mDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=mobile`;
+        const dDirectUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(parsedUrl)}&form_factor=desktop`;
         return NextResponse.json({
           url: parsedUrl,
           pageName: mRes.pageName || dRes.pageName || derivePageName(parsedUrl),
-          mobile: mRes,
-          desktop: dRes,
+          mobile: {
+            ...mRes,
+            reportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+            detailReportUrl: mRes.detailReportUrl || mRes.reportUrl || mDirectUrl,
+          },
+          desktop: {
+            ...dRes,
+            reportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+            detailReportUrl: dRes.detailReportUrl || dRes.reportUrl || dDirectUrl,
+          },
         });
       }
     } catch (apiFallbackErr) {
@@ -237,6 +276,9 @@ export async function POST(req: NextRequest) {
       const mImgbbUrl = (await uploadScreenshotToImgBB(mCardDataUri, `${known.pageName} - Mobile`)) || known.mobile.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
       const dImgbbUrl = (await uploadScreenshotToImgBB(dCardDataUri, `${known.pageName} - Desktop`)) || known.desktop.screenshotUrl || `https://image.thum.io/get/width/1200/crop/800/${known.pageUrl}`;
 
+      const mDirectKnownUrl = buildPageSpeedSnapshotUrl(known.pageUrl, 'mobile', known.mobile.reportUrl) || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(known.pageUrl)}&form_factor=mobile`;
+      const dDirectKnownUrl = buildPageSpeedSnapshotUrl(known.pageUrl, 'desktop', known.desktop.reportUrl) || `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(known.pageUrl)}&form_factor=desktop`;
+
       return NextResponse.json({
         url: known.pageUrl,
         pageName: known.pageName,
@@ -255,7 +297,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: mImgbbUrl,
           screenshotDataUri: mCardDataUri,
-          reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'mobile', known.mobile.reportUrl),
+          reportUrl: mDirectKnownUrl,
+          detailReportUrl: mDirectKnownUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
         desktop: {
@@ -271,7 +314,8 @@ export async function POST(req: NextRequest) {
           },
           screenshotUrl: dImgbbUrl,
           screenshotDataUri: dCardDataUri,
-          reportUrl: buildPageSpeedSnapshotUrl(known.pageUrl, 'desktop', known.desktop.reportUrl),
+          reportUrl: dDirectKnownUrl,
+          detailReportUrl: dDirectKnownUrl,
           comment: 'Reference audit data (Book.xlsx)',
         },
       });

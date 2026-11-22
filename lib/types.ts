@@ -50,6 +50,7 @@ export interface PageSpeedApiResponse {
   screenshotDataUri?: string;
   screenshotUrl: string;
   reportUrl: string;
+  detailReportUrl?: string;
   error?: string;
 }
 

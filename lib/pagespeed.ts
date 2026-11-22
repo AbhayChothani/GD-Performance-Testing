@@ -193,7 +193,7 @@ export async function runPageSpeedAudit(
       ? uploadedUrl
       : `https://image.thum.io/get/width/1200/crop/800/${url}`;
 
-    const reportUrl = buildPageSpeedSnapshotUrl(url, strategy);
+    const directDetailUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=${strategy.toLowerCase()}`;
 
     return {
       url,
@@ -208,10 +208,12 @@ export async function runPageSpeedAudit(
       },
       screenshotDataUri: cardDataUri,
       screenshotUrl,
-      reportUrl,
+      reportUrl: directDetailUrl,
+      detailReportUrl: directDetailUrl,
     };
   } catch (err: unknown) {
     const errMessage = err instanceof Error ? err.message : 'Unknown error during PageSpeed audit';
+    const directDetailUrl = `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(url)}&form_factor=${strategy.toLowerCase()}`;
     return {
       url,
       strategy,
@@ -224,7 +226,8 @@ export async function runPageSpeedAudit(
         totalBlockingTime: 0,
       },
       screenshotUrl: fallbackScreenshotUrl,
-      reportUrl: buildPageSpeedSnapshotUrl(url, strategy),
+      reportUrl: directDetailUrl,
+      detailReportUrl: directDetailUrl,
       error: errMessage,
     };
   }

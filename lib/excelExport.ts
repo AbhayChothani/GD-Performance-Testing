@@ -251,7 +251,9 @@ export async function generateExcelWorkbook(
     mRow.getCell(10).border = thinBorder;
 
     // Link for Detail Description (Mobile)
-    const mobileReport = item.mobile.reportUrl || buildPageSpeedSnapshotUrl(item.pageUrl, 'mobile', item.mobile.reportUrl);
+    const mobileReport =
+      item.mobile.reportUrl ||
+      `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(item.pageUrl)}&form_factor=mobile`;
     if (mobileReport) {
       mRow.getCell(11).value = {
         text: mobileReport,
@@ -330,7 +332,9 @@ export async function generateExcelWorkbook(
     dRow.getCell(10).border = thinBorder;
 
     // Link for Detail Description (Desktop)
-    const desktopReport = item.desktop.reportUrl || buildPageSpeedSnapshotUrl(item.pageUrl, 'desktop', item.desktop.reportUrl);
+    const desktopReport =
+      item.desktop.reportUrl ||
+      `https://pagespeed.web.dev/analysis?url=${encodeURIComponent(item.pageUrl)}&form_factor=desktop`;
     if (desktopReport) {
       dRow.getCell(11).value = {
         text: desktopReport,
